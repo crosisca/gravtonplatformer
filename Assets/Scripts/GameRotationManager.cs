@@ -11,18 +11,40 @@ public class GameRotationManager : MonoBehaviour
     [Header("Settings")]
     public bool disablePlayerColliderWhileRotating = false;
 
+    [Header("References")]
     public PlayerController player;
+    public Transform currentCameraTransform;
 
+    [Header("Debug")]
     public bool rotating;
 
     float gravityForce;
 
     public int currentAngle = 0;
 
-    public Transform currentCameraTransform;
     Vector2 desiredGravity;
 
     public Vector2 DirectionToGround => Vector2.down.Rotate(currentAngle);
+
+    public GravityDirection GravityDirection
+    {
+        get
+        {
+            switch (currentAngle)
+            {
+                case 0:
+                    return GravityDirection.DOWN;
+                case 90:
+                    return GravityDirection.RIGHT;
+                case 180:
+                    return GravityDirection.UP;
+                case 270:
+                    return GravityDirection.LEFT;
+            }
+
+            return GravityDirection.DOWN;
+        }
+    }
 
     // Start is called before the first frame update
     void Start ()
@@ -101,4 +123,12 @@ public class GameRotationManager : MonoBehaviour
         Gizmos.DrawLine(player.transform.position, player.transform.position + new Vector3(Physics2D.gravity.x, Physics2D.gravity.y, 0).normalized);
         Gizmos.color = originalColor;
     }
+}
+
+public enum GravityDirection
+{
+    DOWN,
+    RIGHT,
+    UP,
+    LEFT
 }
