@@ -83,7 +83,7 @@ public class PlayerController : MonoBehaviour
         Visual = transform.Find("Gravton_Character");
     }
 
-    void FixedUpdate ()
+    void FixedUpdate()
     {
         //Check the environment to determine status
         PhysicsCheck();
