@@ -27,8 +27,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4228821929134307490}
-  m_LocalRotation: {x: 0, y: 0, z: 0.00000013317911, w: 1}
-  m_LocalPosition: {x: 15.845709, y: 3.014999, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 12.544971, y: 1.0150015, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 4228821929913319826}
@@ -95,23 +95,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   drawDebugRaycasts: 1
-  speed: 8
+  speed: 3
   coyoteDuration: 0.05
-  maxFallSpeed: -25
-  jumpForce: 5
-  jumpHoldForce: 0.5
-  jumpHoldDuration: 0.1
+  maxFallSpeed: 10
+  jumpForce: 8
   footOffset: 0.2
   eyeHeight: 1.5
   reachOffset: 0.7
-  headClearance: 0.5
   groundDistance: 0.2
-  grabDistance: 0.4
   groundLayer:
     serializedVersion: 2
     m_Bits: 256
   isOnGround: 1
-  isJumping: 0
+  fallingSpeed: -0
+  gravityDirection: 0
 --- !u!114 &4228821929134307503
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,8 +121,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ed74a35d800eba4458d074608c242d5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  testTouchControlsInEditor: 0
-  verticalDPadThreshold: 0.5
   horizontal: 0
   jumpHeld: 0
   jumpPressed: 0
