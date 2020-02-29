@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using MEC;
 using UnityEngine;
 
 public class GameRotationManager : MonoBehaviour
@@ -8,21 +9,18 @@ public class GameRotationManager : MonoBehaviour
 
     public static GameRotationManager Instance => instance ?? (instance = FindObjectOfType<GameRotationManager>());
 
-    [Header("Settings")]
-    public bool disablePlayerColliderWhileRotating = false;
-
     [Header("References")]
-    public PlayerController player;
+    public PlayerMovement player;
     public Transform currentCameraTransform;
 
     [Header("Debug")]
     public bool rotating;
 
-    float gravityForce;
-
     public int currentAngle = 0;
 
     Vector2 desiredGravity;
+    float gravityMagnitude;
+    public float worldRotationSpeed = 10;
 
     public Vector2 DirectionToGround => Vector2.down.Rotate(currentAngle);
 
@@ -50,7 +48,7 @@ public class GameRotationManager : MonoBehaviour
     void Start ()
     {
         desiredGravity = Physics2D.gravity;
-        gravityForce = Physics2D.gravity.magnitude;
+        gravityMagnitude = Physics2D.gravity.magnitude;
     }
 
     // Update is called once per frame
@@ -65,42 +63,56 @@ public class GameRotationManager : MonoBehaviour
             return;
 
         if (Input.GetKeyDown(KeyCode.E))
-        {
-            currentAngle = Clamp0360(currentAngle + 90);
-            StartCoroutine(RotateCamera(90));
-        }
+            RotateWorld(currentAngle + 90);
         else if (Input.GetKeyDown(KeyCode.Q))
-        {
-            currentAngle = Clamp0360(currentAngle - 90);
-            StartCoroutine(RotateCamera(-90));
-        }
+            RotateWorld(currentAngle - 90);
+    }
 
-        desiredGravity = rotating ? Vector2.zero : (Vector2.down * gravityForce).Rotate(currentAngle);
+    private void FixedUpdate ()
+    {
+        desiredGravity = rotating ? Vector2.zero : (Vector2.down * gravityMagnitude).Rotate(currentAngle);
 
         if (Physics2D.gravity != desiredGravity)
             Physics2D.gravity = desiredGravity;
     }
 
-    IEnumerator RotateCamera (float angle)
+    public void RotateWorld (int targetAngle, bool instant = false)
+    {
+        targetAngle = Clamp0360(targetAngle);
+        if(instant)
+        {
+            currentCameraTransform.rotation = Quaternion.Euler(0, 0, targetAngle);
+            player.transform.rotation = Quaternion.Euler(0, 0, targetAngle);
+            currentAngle = Clamp0360(targetAngle);
+        }
+        else
+            Timing.RunCoroutine(RotateWorldCoroutine(targetAngle));
+    }
+    
+    IEnumerator<float> RotateWorldCoroutine(int targetAngle)
     {
         rotating = true;
 
         Physics2D.gravity = Vector2.zero;
-        
-        if(disablePlayerColliderWhileRotating)
-            player.Collider.enabled = false;
-        
-        for (int i = 0; i < Mathf.Abs(angle); i++)
+
+        targetAngle = Clamp0360(targetAngle);
+        int initialAngle = currentAngle;
+        float t = 0;
+        while (t < 1)
         {
-            currentCameraTransform.Rotate(Vector3.forward, Mathf.Sign(angle));
-            player.transform.RotateAround(player.Visual.position, Vector3.forward, Mathf.Sign(angle));
-            yield return null;
+            t += Timing.DeltaTime * worldRotationSpeed;
+            int lerpAngle = Clamp0360((int)Mathf.LerpAngle(initialAngle, targetAngle, t));
+
+            currentCameraTransform.eulerAngles = new Vector3(0, 0, lerpAngle);
+            player.transform.eulerAngles = new Vector3(0, 0, lerpAngle);
+
+            yield return Timing.WaitForOneFrame;
         }
 
-        if (disablePlayerColliderWhileRotating)
-            player.Collider.enabled = true;
-        
         rotating = false;
+        currentCameraTransform.rotation = Quaternion.Euler(0, 0, targetAngle);
+        player.transform.rotation = Quaternion.Euler(0, 0, targetAngle);
+        currentAngle = Clamp0360(targetAngle);
     }
 
     public static int Clamp0360 (int eulerAngles)
@@ -123,12 +135,4 @@ public class GameRotationManager : MonoBehaviour
         Gizmos.DrawLine(player.transform.position, player.transform.position + new Vector3(Physics2D.gravity.x, Physics2D.gravity.y, 0).normalized);
         Gizmos.color = originalColor;
     }
-}
-
-public enum GravityDirection
-{
-    DOWN,
-    RIGHT,
-    UP,
-    LEFT
 }

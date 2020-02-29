@@ -369,11 +369,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: db2006d719c1f4e42b1adad7b403d715, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  disablePlayerColliderWhileRotating: 0
   player: {fileID: 32117325}
   currentCameraTransform: {fileID: 1831566646}
   rotating: 0
   currentAngle: 0
+  rotationSpeed: 2
 --- !u!4 &1753705171
 Transform:
   m_ObjectHideFlags: 0
