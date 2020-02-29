@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 public class GameManager : MonoBehaviour
 {
@@ -10,10 +11,13 @@ public class GameManager : MonoBehaviour
 
     public GameObject activeLevel;
 
-    void Awake()
+    public int loadedWorldNumber;
+    public int loadedLevelNumber;
+    void Start()
     {
         DontDestroyOnLoad(gameObject);
-        LoadLevel(1,1);
+
+        LoadLevel(1, 1);
     }
 
     void Update()
@@ -25,12 +29,18 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    void LoadLevel(int world, int level)
+    public void LoadLevel(int world, int level)
     {
         if(activeLevel)
             Destroy(activeLevel);
 
         activeLevel = Instantiate(Resources.Load($"World{world}Level{level}")) as GameObject;
-        GameObject.FindGameObjectWithTag("Player").transform.position = Vector3.zero;
+
+        loadedWorldNumber = world;
+        loadedLevelNumber = level;
+
+        GameObject.FindGameObjectWithTag("Player").transform.position = GameObject.FindGameObjectWithTag("SpawnPoint").transform.position;
+
+        GameObject.FindGameObjectWithTag("MainCamera").GetComponent<CinemachineConfiner>().m_BoundingShape2D = GameObject.FindGameObjectWithTag("CameraBounds").GetComponent<PolygonCollider2D>();
     }
 }
