@@ -44,7 +44,7 @@ public class PlayerMovement : MonoBehaviour
     {
         get
         {
-            switch (GameRotationManager.Instance.GravityDirection)
+            switch (GameManager.Instance.GravityDirection)
             {
                 case GravityDirection.UP:
                     return rigidBody.velocity.y;
@@ -98,7 +98,7 @@ public class PlayerMovement : MonoBehaviour
     void UpdateDebugVars()
     {
         fallingSpeed = DownwardsVelocity;
-        gravityDirection = GameRotationManager.Instance.GravityDirection;
+        gravityDirection = GameManager.Instance.GravityDirection;
     }
 
     void PhysicsCheck ()
@@ -107,8 +107,8 @@ public class PlayerMovement : MonoBehaviour
         isOnGround = false;
 
         //Cast rays for the left and right foot
-        RaycastHit2D leftCheck = Raycast(new Vector2(-footOffset, 0f).Rotate(GameRotationManager.Instance.currentAngle), GameRotationManager.Instance.DirectionToGround, groundDistance);
-        RaycastHit2D rightCheck = Raycast(new Vector2(footOffset, 0f).Rotate(GameRotationManager.Instance.currentAngle), GameRotationManager.Instance.DirectionToGround, groundDistance);
+        RaycastHit2D leftCheck = Raycast(new Vector2(-footOffset, 0f).Rotate(GameManager.Instance.WorldRotationAngle), GameManager.Instance.DirectionToGround, groundDistance);
+        RaycastHit2D rightCheck = Raycast(new Vector2(footOffset, 0f).Rotate(GameManager.Instance.WorldRotationAngle), GameManager.Instance.DirectionToGround, groundDistance);
 
         //If either ray hit the ground, the player is on the ground
         if (leftCheck || rightCheck)
@@ -124,7 +124,7 @@ public class PlayerMovement : MonoBehaviour
         if (horizontalVelocity * direction < 0f)
             FlipCharacterDirection();
 
-        if (GameRotationManager.Instance.rotating)
+        if (GameManager.Instance.IsRotating)
         {
             rigidBody.velocity = Vector2.zero;
             return;
@@ -138,7 +138,7 @@ public class PlayerMovement : MonoBehaviour
 
     void SetLocalHorizontalVelocity(float horizontalVel)
     {
-        switch (GameRotationManager.Instance.GravityDirection)
+        switch (GameManager.Instance.GravityDirection)
         {
             case GravityDirection.DOWN:
                 rigidBody.velocity = new Vector2(horizontalVel, rigidBody.velocity.y);
@@ -157,7 +157,7 @@ public class PlayerMovement : MonoBehaviour
 
     void SetLocalVerticalVelocity(float verticalVel)
     {
-        switch (GameRotationManager.Instance.GravityDirection)
+        switch (GameManager.Instance.GravityDirection)
         {
             case GravityDirection.DOWN:
                 rigidBody.velocity = new Vector2(rigidBody.velocity.x, verticalVel);
@@ -188,7 +188,7 @@ public class PlayerMovement : MonoBehaviour
             //jumpTime = Time.time + jumpHoldDuration;
 
             //...add the jump force to the rigidbody...
-            rigidBody.AddForce(-GameRotationManager.Instance.DirectionToGround * jumpForce, ForceMode2D.Impulse);
+            rigidBody.AddForce(-GameManager.Instance.DirectionToGround * jumpForce, ForceMode2D.Impulse);
         }
         ////Otherwise, if currently within the jump time window...
         //else if (isJumping)

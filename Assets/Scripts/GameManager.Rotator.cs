@@ -3,18 +3,12 @@ using System.Collections.Generic;
 using MEC;
 using UnityEngine;
 
-public class GameRotationManager : MonoBehaviour
+public partial class GameManager : MonoBehaviour
 {
-    static GameRotationManager instance;
-
-    public static GameRotationManager Instance => instance ?? (instance = FindObjectOfType<GameRotationManager>());
-
     [Header("References")]
-    public PlayerMovement player;
     public Transform currentCameraTransform;
 
-    [Header("Debug")]
-    public bool rotating;
+    public bool IsRotating { get; private set; }
 
     public int currentAngle = 0;
 
@@ -23,6 +17,8 @@ public class GameRotationManager : MonoBehaviour
     public float worldRotationSpeed = 10;
 
     public Vector2 DirectionToGround => Vector2.down.Rotate(currentAngle);
+
+    public float WorldRotationAngle => currentAngle;
 
     public GravityDirection GravityDirection
     {
@@ -45,21 +41,22 @@ public class GameRotationManager : MonoBehaviour
     }
 
     // Start is called before the first frame update
-    void Start ()
+    void StartRotator ()
     {
         desiredGravity = Physics2D.gravity;
         gravityMagnitude = Physics2D.gravity.magnitude;
+
+        AddUpdate(CheckRotationInputs);
     }
 
-    // Update is called once per frame
-    void Update ()
+    void DestroyRotator()
     {
-        CheckRotationInputs();
+        RemoveUpdate(CheckRotationInputs);
     }
-
+    
     void CheckRotationInputs ()
     {
-        if (rotating)
+        if (IsRotating)
             return;
 
         if (Input.GetKeyDown(KeyCode.E))
@@ -70,7 +67,7 @@ public class GameRotationManager : MonoBehaviour
 
     private void FixedUpdate ()
     {
-        desiredGravity = rotating ? Vector2.zero : (Vector2.down * gravityMagnitude).Rotate(currentAngle);
+        desiredGravity = IsRotating ? Vector2.zero : (Vector2.down * gravityMagnitude).Rotate(currentAngle);
 
         if (Physics2D.gravity != desiredGravity)
             Physics2D.gravity = desiredGravity;
@@ -78,39 +75,34 @@ public class GameRotationManager : MonoBehaviour
 
     public void RotateWorld (int targetAngle, bool instant = false)
     {
-        targetAngle = Clamp0360(targetAngle);
-        if(instant)
-        {
-            currentCameraTransform.rotation = Quaternion.Euler(0, 0, targetAngle);
-            player.transform.rotation = Quaternion.Euler(0, 0, targetAngle);
-            currentAngle = Clamp0360(targetAngle);
-        }
-        else
-            Timing.RunCoroutine(RotateWorldCoroutine(targetAngle));
+        Timing.RunCoroutine(RotateWorldCoroutine(targetAngle));
     }
     
-    IEnumerator<float> RotateWorldCoroutine(int targetAngle)
+    IEnumerator<float> RotateWorldCoroutine(int targetAngle, bool instant = false)
     {
-        rotating = true;
+        IsRotating = true;
 
         Physics2D.gravity = Vector2.zero;
 
         targetAngle = Clamp0360(targetAngle);
-        int initialAngle = currentAngle;
-        float t = 0;
-        while (t < 1)
+
+        if(!instant)
         {
-            t += Timing.DeltaTime * worldRotationSpeed;
-            int lerpAngle = Clamp0360((int)Mathf.LerpAngle(initialAngle, targetAngle, t));
+            int initialAngle = currentAngle;
+            float t = 0;
+            while (t < 1)
+            {
+                t += Timing.DeltaTime * worldRotationSpeed;
+                int lerpAngle = Clamp0360((int)Mathf.LerpAngle(initialAngle, targetAngle, t));
 
-            currentCameraTransform.eulerAngles = new Vector3(0, 0, lerpAngle);
-            player.transform.eulerAngles = new Vector3(0, 0, lerpAngle);
+                player.transform.eulerAngles = new Vector3(0, 0, lerpAngle);
 
-            yield return Timing.WaitForOneFrame;
+                yield return Timing.WaitForOneFrame;
+            }
         }
+        
+        IsRotating = false;
 
-        rotating = false;
-        currentCameraTransform.rotation = Quaternion.Euler(0, 0, targetAngle);
         player.transform.rotation = Quaternion.Euler(0, 0, targetAngle);
         currentAngle = Clamp0360(targetAngle);
     }
@@ -125,14 +117,14 @@ public class GameRotationManager : MonoBehaviour
         return result;
     }
 
-    void OnDrawGizmos ()
-    {
-        if (!Application.isPlaying)
-            return;
+    //void OnDrawGizmos ()
+    //{
+    //    if (!Application.isPlaying)
+    //        return;
 
-        Color originalColor = Gizmos.color;
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawLine(player.transform.position, player.transform.position + new Vector3(Physics2D.gravity.x, Physics2D.gravity.y, 0).normalized);
-        Gizmos.color = originalColor;
-    }
+    //    Color originalColor = Gizmos.color;
+    //    Gizmos.color = Color.cyan;
+    //    Gizmos.DrawLine(player.transform.position, player.transform.position + new Vector3(Physics2D.gravity.x, Physics2D.gravity.y, 0).normalized);
+    //    Gizmos.color = originalColor;
+    //}
 }

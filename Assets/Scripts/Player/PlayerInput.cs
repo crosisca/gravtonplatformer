@@ -1,6 +1,7 @@
 ﻿// This script handles inputs for the player. It serves two main purposes: 1) wrap up
 // inputs so swapping between mobile and standalone is simpler and 2) keeping inputs
 // from Update() in sync with FixedUpdate()
+using System;
 using UnityEngine;
 
 //We first ensure this script runs before all other player scripts to prevent laggy
@@ -22,16 +23,22 @@ public class PlayerInput : MonoBehaviour
 	private void Awake()
 	{
 		inputActions = new PlayerInputActions();
+
+		GameManager.Instance.OnLevelStarted += OnLevelStarted;
+		GameManager.Instance.OnLevelCompleted += OnLevelCompleted;
 	}
 
-	private void OnEnable()	
+	private void OnLevelStarted ()
 	{
 		inputActions.Enable();
 	}
 
-	private void OnDisable()
+	void OnLevelCompleted (int worldNumber, int levelNumber)
 	{
 		inputActions.Disable();
+
+		GameManager.Instance.OnLevelStarted -= OnLevelStarted;
+		GameManager.Instance.OnLevelCompleted -= OnLevelCompleted;
 	}
 
 	void Update()

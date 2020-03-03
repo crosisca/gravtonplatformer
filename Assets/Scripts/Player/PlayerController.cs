@@ -9,17 +9,7 @@ public class PlayerController : MonoBehaviour
     public Action OnDeath;
     public Action OnDeathCompleted;
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    public PlayerInput input;
 
     public void GoToSpawnPoint()
     {

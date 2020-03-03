@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EndPoint : MonoBehaviour
+public class EndPoint : MapItem
 {
-    private void OnTriggerEnter2D(Collider2D collision)
+    protected override void OnTriggerEnter2D (Collider2D collision)
     {
+        base.OnTriggerEnter2D(collision);
+
         if (collision.CompareTag("Player"))
-            GameManager.Instance.StartNewLevel(GameManager.Instance.loadedWorldNumber, ++GameManager.Instance.loadedLevelNumber);
+            GameManager.Instance.LevelGoalReached(this);
     }
 }
