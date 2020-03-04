@@ -4,6 +4,7 @@ using UnityEngine;
 using Cinemachine;
 using MEC;
 using System;
+using UnityEngine.SceneManagement;
 
 public partial class GameManager : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public partial class GameManager : MonoBehaviour
 
     public static GameManager Instance => instance ?? (instance = FindObjectOfType<GameManager>());
 
-    public GameObject activeLevel;
+    public GameObject activeLevel;TODO activeLevel must become acticeScene
 
     public int loadedWorldNumber;
     public int loadedLevelNumber;
@@ -135,10 +136,15 @@ public partial class GameManager : MonoBehaviour
         if(activeLevel != null)
             UnloadCurrentLevel();
 
+        #region LoadSync(prefab)
         yield return Timing.WaitForOneFrame;
 
         LoadLevel(world, level);
+        #endregion
 
+        #region LoadAsync(scene)
+        yield return Timing.WaitUntilDone(LoadLevelAsync(world, level));
+        #endregion
         yield return Timing.WaitForOneFrame;
 
         player = Instantiate(Resources.Load<PlayerController>(Constants.PlayerPrefabPath), Vector3.zero, Quaternion.identity);
@@ -175,11 +181,24 @@ public partial class GameManager : MonoBehaviour
         loadedLevelNumber = level;
     }
 
+    IEnumerator<float> LoadLevelAsync(int world, int level)
+    {
+        AsyncOperation loadLevelOperation = SceneManager.LoadSceneAsync($"Level{world}Level{level}", LoadSceneMode.Additive);
+        loadLevelOperation.allowSceneActivation = false;
+        while (!loadLevelOperation.isDone)
+        {
+            yield return Timing.WaitForOneFrame;
+        }
+        loadLevelOperation.allowSceneActivation = true;
+    }
+
     public void UnloadCurrentLevel()
     {
         Destroy(playerCamera.gameObject);
 
         Destroy(player.gameObject);
+
+        SceneManager.UnloadSceneAsync($"World{loadedWorldNumber}Level{loadedLevelNumber}");
 
         if (activeLevel)
             Destroy(activeLevel);
