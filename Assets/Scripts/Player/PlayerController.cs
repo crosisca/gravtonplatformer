@@ -9,8 +9,6 @@ public class PlayerController : MonoBehaviour
     public Action OnDeath;
     public Action OnDeathCompleted;
 
-    public PlayerInput input;
-
     public void GoToSpawnPoint()
     {
         transform.position = GameObject.FindGameObjectWithTag("SpawnPoint").transform.position;

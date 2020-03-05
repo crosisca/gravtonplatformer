@@ -81,9 +81,17 @@ public class PlayerMovement : MonoBehaviour
         originalXScale = transform.localScale.x;
 
         Visual = transform.Find("Gravton_Character");
+
+        GameManager.Instance.AddFixedUpdate(OnFixedUpdate);
+        GameManager.Instance.OnLevelGoalReached += OnGoalreached;
     }
 
-    void FixedUpdate()
+    private void OnGoalreached (int arg1, int arg2)
+    {
+        rigidBody.isKinematic = true;
+    }
+
+    void OnFixedUpdate ()
     {
         //Check the environment to determine status
         PhysicsCheck();
@@ -250,5 +258,11 @@ public class PlayerMovement : MonoBehaviour
 
         //Return the results of the raycast
         return hit;
+    }
+
+    private void OnDestroy ()
+    {
+        GameManager.Instance.OnLevelGoalReached -= OnGoalreached;
+        GameManager.Instance.RemoveFixedUpdate(OnFixedUpdate);
     }
 }

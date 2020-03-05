@@ -5,9 +5,6 @@ using UnityEngine;
 
 public partial class GameManager : MonoBehaviour
 {
-    [Header("References")]
-    public Transform currentCameraTransform;
-
     public bool IsRotating { get; private set; }
 
     public int currentAngle = 0;

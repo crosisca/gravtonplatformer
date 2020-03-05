@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Cinemachine;
 using MEC;
 using System;
 using UnityEngine.SceneManagement;
@@ -12,7 +11,7 @@ public partial class GameManager : MonoBehaviour
 
     public static GameManager Instance => instance ?? (instance = FindObjectOfType<GameManager>());
 
-    public GameObject activeLevel;TODO activeLevel must become acticeScene
+    public Scene activeLevel;
 
     public int loadedWorldNumber;
     public int loadedLevelNumber;
@@ -133,18 +132,11 @@ public partial class GameManager : MonoBehaviour
 
     IEnumerator<float> LoadLevelCoroutine (int world, int level)
     {
-        if(activeLevel != null)
-            UnloadCurrentLevel();
+        if (activeLevel.isLoaded)
+            Timing.WaitUntilDone(UnloadLevelAsync());
 
-        #region LoadSync(prefab)
-        yield return Timing.WaitForOneFrame;
-
-        LoadLevel(world, level);
-        #endregion
-
-        #region LoadAsync(scene)
         yield return Timing.WaitUntilDone(LoadLevelAsync(world, level));
-        #endregion
+
         yield return Timing.WaitForOneFrame;
 
         player = Instantiate(Resources.Load<PlayerController>(Constants.PlayerPrefabPath), Vector3.zero, Quaternion.identity);
@@ -173,40 +165,55 @@ public partial class GameManager : MonoBehaviour
         OnLevelStarted?.Invoke();
     }
 
-    void LoadLevel (int world, int level)
+    IEnumerator<float> LoadLevelAsync(int world, int level)
     {
-        activeLevel = Instantiate(Resources.Load($"World{world}Level{level}")) as GameObject;
+        string sceneName = $"World{world}Level{level}";
 
+        AsyncOperation loadLevelOperation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
+
+        loadLevelOperation.allowSceneActivation = false;
+
+        while (!loadLevelOperation.isDone)
+        {
+            if (loadLevelOperation.progress >= 0.9f)// <-- Unity being stupid and finishing loading when progress equals 0.9
+                loadLevelOperation.allowSceneActivation = true;
+
+            yield return Timing.WaitForOneFrame;
+        }
+
+        activeLevel = SceneManager.GetSceneByName(sceneName);
+        SceneManager.SetActiveScene(activeLevel);
         loadedWorldNumber = world;
         loadedLevelNumber = level;
     }
 
-    IEnumerator<float> LoadLevelAsync(int world, int level)
-    {
-        AsyncOperation loadLevelOperation = SceneManager.LoadSceneAsync($"Level{world}Level{level}", LoadSceneMode.Additive);
-        loadLevelOperation.allowSceneActivation = false;
-        while (!loadLevelOperation.isDone)
-        {
-            yield return Timing.WaitForOneFrame;
-        }
-        loadLevelOperation.allowSceneActivation = true;
-    }
+    CoroutineHandle unloadCoroutine;
 
     public void UnloadCurrentLevel()
     {
-        Destroy(playerCamera.gameObject);
+        if(!unloadCoroutine.IsRunning)
+            unloadCoroutine = Timing.RunCoroutine(UnloadLevelAsync());
+    }
 
-        Destroy(player.gameObject);
+    IEnumerator<float> UnloadLevelAsync()
+    {
+        if(playerCamera != null)
+            Destroy(playerCamera.gameObject);
 
-        SceneManager.UnloadSceneAsync($"World{loadedWorldNumber}Level{loadedLevelNumber}");
+        if(player != null)
+            Destroy(player.gameObject);
 
-        if (activeLevel)
-            Destroy(activeLevel);
+        AsyncOperation unloadLevelOperation = SceneManager.UnloadSceneAsync(activeLevel);
 
+        while (!unloadLevelOperation.isDone)
+            yield return Timing.WaitForOneFrame;
 
+        Resources.UnloadUnusedAssets();
 
         loadedWorldNumber = 0;
         loadedLevelNumber = 0;
+
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName("Application"));
     }
 
     
@@ -214,6 +221,8 @@ public partial class GameManager : MonoBehaviour
     public void LevelGoalReached(EndPoint goal)
     {
         OnLevelGoalReached?.Invoke(loadedWorldNumber, loadedLevelNumber);
+
+        Timing.KillCoroutines(coroutinesTag);
 
         Timing.CallDelayed(1, LevelCompleted);
     }
@@ -227,6 +236,9 @@ public partial class GameManager : MonoBehaviour
     private void OnDestroy ()
     {
         Timing.KillCoroutines(coroutinesTag);
+        registeredUpdates.Clear();
+        registeredFixedUpdates.Clear();
+        registeredLateUpdates.Clear();
         DestroyRotator();
         instance = null;
     }

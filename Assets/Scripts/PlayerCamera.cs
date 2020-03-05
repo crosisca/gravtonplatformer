@@ -40,4 +40,9 @@ public class PlayerCamera : MonoBehaviour
         GameManager.Instance.OnLevelLoadCompleted -= OnLevelLoadCompleted;
         GameManager.Instance.OnLevelCompleted -= OnLevelCompleted;
     }
+
+    private void OnDestroy ()
+    {
+        GameManager.Instance.RemoveLateUpdate(OnLateUpdate);
+    }
 }
