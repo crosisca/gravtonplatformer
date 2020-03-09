@@ -43,9 +43,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bba535ee2d1e76141bb0523116e6ee0a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentCameraTransform: {fileID: 0}
   currentAngle: 0
-  worldRotationSpeed: 10
-  activeLevel: {fileID: 0}
+  worldRotationSpeed: 2
+  activeLevel:
+    m_Handle: 0
   loadedWorldNumber: 0
   loadedLevelNumber: 0

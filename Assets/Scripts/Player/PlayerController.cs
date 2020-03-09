@@ -9,6 +9,13 @@ public class PlayerController : MonoBehaviour
     public Action OnDeath;
     public Action OnDeathCompleted;
 
+    public PlayerMovement Movement { get; private set; }
+
+    private void Awake ()
+    {
+        Movement = GetComponent<PlayerMovement>();
+    }
+
     public void GoToSpawnPoint()
     {
         transform.position = GameObject.FindGameObjectWithTag("SpawnPoint").transform.position;

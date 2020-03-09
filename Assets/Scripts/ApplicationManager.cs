@@ -14,6 +14,11 @@ public class ApplicationManager : MonoBehaviour
 
     public GameManager GameManager { get; private set; }
 
+    LevelSelectionPanel levelSelectionPanel;
+
+    public event Action OnGameSessionStarted;
+    public event Action OnGameSessionFinished;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     public static void Initialize()
     {
@@ -24,24 +29,19 @@ public class ApplicationManager : MonoBehaviour
     {
         gameObject.name = "[ApplicationManager]";
         DontDestroyOnLoad(gameObject);
+        levelSelectionPanel = FindObjectOfType<LevelSelectionPanel>();
     }
 
     private void Start ()
     {
-        Button[] lvlButtons = GameObject.Find("World1Levels").transform.GetComponentsInChildren<Button>();
-        for (int i = 0; i < lvlButtons.Length; i++)
-        {
-            int n = i+1;
-            lvlButtons[i].onClick.AddListener(() => OnLevelButtonClicked(n));
-        }
-
-        GameObject.Find("Button_Unload").GetComponent<Button>().onClick.AddListener(ForceUnloadCurrentLevel);
-        GameObject.Find("Button_Pause").GetComponent<Button>().onClick.AddListener(ForceTogglePause);
+        levelSelectionPanel.OnLevelSelected += OnLevelSelected;
     }
 
-    public void OnLevelButtonClicked(int lvlNumber)
+    public void OnLevelSelected(int worldNumber, int levelNumber)
     {
-        StartGameLevel(1, lvlNumber);
+        StartGameLevel(worldNumber, levelNumber);
+        
+        levelSelectionPanel.Close();
     }
 
     public void StartGameLevel(int worldNumber, int levelNumber)
@@ -51,9 +51,11 @@ public class ApplicationManager : MonoBehaviour
 
         GameManager = Instantiate(Resources.Load<GameManager>(Constants.GameManagerPrefabPath));
 
-        GameManager.Instance.StartNewLevel(worldNumber, levelNumber);
-        GameManager.Instance.OnLevelGoalReached += OnLevelGoalReached;
-        GameManager.Instance.OnLevelFinished += OnLevelFinished;
+        GameManager.StartNewLevel(worldNumber, levelNumber);
+        GameManager.OnLevelGoalReached += OnLevelGoalReached;
+        GameManager.OnLevelFinished += OnLevelFinished;
+
+        OnGameSessionStarted?.Invoke();
     }
 
     private void OnLevelGoalReached (int worldNumber, int levelNumber)
@@ -65,7 +67,7 @@ public class ApplicationManager : MonoBehaviour
     {
         EndGameLevel();
 
-        Timing.CallDelayed(1, () => StartGameLevel(worldNumber, ++levelNumber));
+        ShowMenu();
     }
 
     public void EndGameLevel()
@@ -73,32 +75,18 @@ public class ApplicationManager : MonoBehaviour
         if (GameManager == null)
             return;
 
+        OnGameSessionFinished?.Invoke();
+
         GameManager.OnLevelGoalReached -= OnLevelGoalReached;
         GameManager.OnLevelFinished -= OnLevelFinished;
 
         GameManager.Terminate();
         GameManager = null;
-        
+    }
+
+    void ShowMenu()
+    {
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("Application"));
-    }
-
-    public void ForceUnloadCurrentLevel()
-    {
-        EndGameLevel();
-    }
-
-    public void ForceTogglePause ()
-    {
-        GameManager?.TogglePause();
-    }
-
-    void Update ()
-    {
-        //Debug load level 1-9 pressing keys
-        for (int i = 49; i < 58; i++)
-        {
-            if (Input.GetKeyDown((KeyCode)i))
-                StartGameLevel(1, i - 48);
-        }
+        levelSelectionPanel.Open();
     }
 }

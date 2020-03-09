@@ -54,8 +54,13 @@ public partial class GameManager : MonoBehaviour
     const string coroutinesTag = "gameManager";
 
     public bool IsPaused { get; private set;}
+    public event Action<bool> OnPauseChanged;
 
     CoroutineHandle unloadCoroutine;
+
+    IngameHUDPanel hud;
+
+    Canvas canvas;
 
     private void OnPlayerDeath ()
     {
@@ -120,9 +125,14 @@ public partial class GameManager : MonoBehaviour
         }
     }
 
-    public bool TogglePause()
+    public bool TogglePause(bool? pause = null)
     {
-        IsPaused = !IsPaused;
+        if (pause != null)
+            IsPaused = (bool)pause;
+        else
+            IsPaused = !IsPaused;
+
+        OnPauseChanged?.Invoke(IsPaused);
         return IsPaused;
     }
 
@@ -165,6 +175,16 @@ public partial class GameManager : MonoBehaviour
         startLevelCoroutine = Timing.RunCoroutine(LoadLevelCoroutine(world, level));
     }
 
+    public void RestartLevel()
+    {
+        player.GoToSpawnPoint();
+        RotateWorld(0, true);
+        TogglePause(false);
+        //TODO show start lvl ui
+        //HACK
+        OnClickedStarLevel();//hack
+    }
+
     IEnumerator<float> LoadLevelCoroutine (int world, int level)
     {
         if (activeLevel.isLoaded)
@@ -192,7 +212,13 @@ public partial class GameManager : MonoBehaviour
 
         yield return Timing.WaitForOneFrame;
 
-        OnClickedStarLevel();
+
+        canvas = Instantiate(Resources.Load<Canvas>("IngameCanvas"));
+
+        hud = Instantiate(Resources.Load<IngameHUDPanel>("IngameHUDPanel"), canvas.transform);
+
+        //HACK
+        OnClickedStarLevel();//hack
     }
 
     void OnClickedStarLevel()
@@ -266,7 +292,7 @@ public partial class GameManager : MonoBehaviour
         Timing.KillCoroutines(coroutinesTag);
     }
 
-    void FinishLevel()
+    public void FinishLevel()
     {
         OnLevelFinished?.Invoke(loadedWorldNumber, loadedLevelNumber);
     }

@@ -36,6 +36,8 @@ public class PlayerMovement : MonoBehaviour
     float originalXScale;                   //Original scale on X axis
     int direction = 1;                      //Direction player is facing
 
+    public event Action OnLand;
+
     public BoxCollider2D Collider { get; private set; }
 
     public Transform Visual { get; private set; }
@@ -93,6 +95,9 @@ public class PlayerMovement : MonoBehaviour
 
     void OnFixedUpdate ()
     {
+        if (GameManager.Instance.IsPaused)
+            return;
+
         //Check the environment to determine status
         PhysicsCheck();
 
@@ -109,18 +114,29 @@ public class PlayerMovement : MonoBehaviour
         gravityDirection = GameManager.Instance.GravityDirection;
     }
 
+    bool wasOnGround;
+
     void PhysicsCheck ()
     {
         //Start by assuming the player isn't on the ground and the head isn't blocked
-        isOnGround = false;
+        //isOnGround = false;
 
         //Cast rays for the left and right foot
         RaycastHit2D leftCheck = Raycast(new Vector2(-footOffset, 0f).Rotate(GameManager.Instance.WorldRotationAngle), GameManager.Instance.DirectionToGround, groundDistance);
         RaycastHit2D rightCheck = Raycast(new Vector2(footOffset, 0f).Rotate(GameManager.Instance.WorldRotationAngle), GameManager.Instance.DirectionToGround, groundDistance);
 
+        isOnGround = leftCheck || rightCheck;
+
+        if (isOnGround && !wasOnGround)
+            OnLand?.Invoke();
+
+        wasOnGround = isOnGround;
+
         //If either ray hit the ground, the player is on the ground
-        if (leftCheck || rightCheck)
-            isOnGround = true;
+        //if (leftCheck || rightCheck)
+        //{
+        //    isOnGround = true;
+        //}
     }
 
     void GroundMovement ()
