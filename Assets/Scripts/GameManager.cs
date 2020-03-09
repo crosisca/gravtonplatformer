@@ -272,7 +272,7 @@ public partial class GameManager : MonoBehaviour
         loadedWorldNumber = 0;
         loadedLevelNumber = 0;
 
-        Destroy(gameObject);
+        ApplicationManager.Instance.DestroyGameManager();
     }
 
     
@@ -294,11 +294,15 @@ public partial class GameManager : MonoBehaviour
 
     public void FinishLevel()
     {
+        Debug.Log("GameManager.FinishLevel -> OnLevelFinished.Invoke");
         OnLevelFinished?.Invoke(loadedWorldNumber, loadedLevelNumber);
     }
 
     public void Terminate ()
     {
+        Debug.Log("GameManager.Terminate");
+        Destroy(player);
+        Destroy(playerCamera);
         Timing.KillCoroutines(coroutinesTag);
         registeredUpdates.Clear();
         registeredFixedUpdates.Clear();

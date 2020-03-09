@@ -81,12 +81,17 @@ public class ApplicationManager : MonoBehaviour
         GameManager.OnLevelFinished -= OnLevelFinished;
 
         GameManager.Terminate();
-        GameManager = null;
     }
 
     void ShowMenu()
     {
         SceneManager.SetActiveScene(SceneManager.GetSceneByName("Application"));
         levelSelectionPanel.Open();
+    }
+
+    public void DestroyGameManager()
+    {
+        Destroy(GameManager.gameObject);
+        GameManager = null;
     }
 }
