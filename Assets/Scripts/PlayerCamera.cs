@@ -16,7 +16,7 @@ public class PlayerCamera : MonoBehaviour
         virtualCamera = GetComponent<CinemachineVirtualCamera>();
         confiner = GetComponent<CinemachineConfiner>();
         GameManager.Instance.OnLevelLoadCompleted += OnLevelLoadCompleted;
-        GameManager.Instance.OnLevelCompleted += OnLevelCompleted;
+        GameManager.Instance.OnLevelFinished += OnLevelFinished;
     }
 
     void OnLevelLoadCompleted ()
@@ -34,11 +34,11 @@ public class PlayerCamera : MonoBehaviour
             transform.rotation = player.transform.rotation;
     }
 
-    void OnLevelCompleted (int worldNumber, int levelNumber)
+    void OnLevelFinished (int worldNumber, int levelNumber)
     {
         GameManager.Instance.RemoveLateUpdate(OnLateUpdate);
         GameManager.Instance.OnLevelLoadCompleted -= OnLevelLoadCompleted;
-        GameManager.Instance.OnLevelCompleted -= OnLevelCompleted;
+        GameManager.Instance.OnLevelFinished -= OnLevelFinished;
     }
 
     private void OnDestroy ()

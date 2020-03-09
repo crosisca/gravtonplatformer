@@ -25,7 +25,7 @@ public class PlayerInput : MonoBehaviour
 		inputActions = new PlayerInputActions();
 
 		GameManager.Instance.OnLevelStarted += OnLevelStarted;
-		GameManager.Instance.OnLevelCompleted += OnLevelCompleted;
+		GameManager.Instance.OnLevelFinished += OnLevelFinished;
 	}
 
 	private void OnLevelStarted ()
@@ -33,12 +33,12 @@ public class PlayerInput : MonoBehaviour
 		inputActions.Enable();
 	}
 
-	void OnLevelCompleted (int worldNumber, int levelNumber)
+	void OnLevelFinished (int worldNumber, int levelNumber)
 	{
 		inputActions.Disable();
 
 		GameManager.Instance.OnLevelStarted -= OnLevelStarted;
-		GameManager.Instance.OnLevelCompleted -= OnLevelCompleted;
+		GameManager.Instance.OnLevelFinished -= OnLevelFinished;
 	}
 
 	void Update()

@@ -5,11 +5,22 @@ using MEC;
 using System;
 using UnityEngine.SceneManagement;
 
+public enum GameState
+{
+    Unset,
+    Paused,
+    Loading,
+    WaitingToStart,
+    Running,
+    GoalReached,
+    Failed,
+    Unloading,
+    Reseting,
+}
+
 public partial class GameManager : MonoBehaviour
 {
-    static GameManager instance;
-
-    public static GameManager Instance => instance ?? (instance = FindObjectOfType<GameManager>());
+    public static GameManager Instance => ApplicationManager.Instance.GameManager;
 
     public Scene activeLevel;
 
@@ -34,9 +45,17 @@ public partial class GameManager : MonoBehaviour
     /// <summary>
     /// WorldNumber, LevelNumber
     /// </summary>
-    public event Action<int,int> OnLevelCompleted;
+    public event Action<int,int> OnLevelFinished;
+    /// <summary>
+    /// WorldNumber, LevelNumber
+    /// </summary>
+    public event Action<int, int> OnLevelFailed;
 
     const string coroutinesTag = "gameManager";
+
+    public bool IsPaused { get; private set;}
+
+    CoroutineHandle unloadCoroutine;
 
     private void OnPlayerDeath ()
     {
@@ -92,11 +111,27 @@ public partial class GameManager : MonoBehaviour
         while (gameObject != null)
         {
             if (gameObject.activeInHierarchy && enabled)
+            {
+                OnFixedUpdate();
                 foreach (Action func in registeredFixedUpdates)
                     func();
-
+            }
             yield return Timing.WaitForOneFrame;
         }
+    }
+
+    public bool TogglePause()
+    {
+        IsPaused = !IsPaused;
+        return IsPaused;
+    }
+
+    void OnFixedUpdate()
+    {
+        if (IsPaused)
+            return;
+
+        Physics2D.Simulate(Timing.DeltaTime);
     }
 
     public void AddLateUpdate (Action func)
@@ -187,9 +222,7 @@ public partial class GameManager : MonoBehaviour
         loadedLevelNumber = level;
     }
 
-    CoroutineHandle unloadCoroutine;
-
-    public void UnloadCurrentLevel()
+    void UnloadCurrentLevel()
     {
         if(!unloadCoroutine.IsRunning)
             unloadCoroutine = Timing.RunCoroutine(UnloadLevelAsync());
@@ -213,7 +246,7 @@ public partial class GameManager : MonoBehaviour
         loadedWorldNumber = 0;
         loadedLevelNumber = 0;
 
-        SceneManager.SetActiveScene(SceneManager.GetSceneByName("Application"));
+        Destroy(gameObject);
     }
 
     
@@ -224,22 +257,28 @@ public partial class GameManager : MonoBehaviour
 
         Timing.KillCoroutines(coroutinesTag);
 
-        Timing.CallDelayed(1, LevelCompleted);
+        Timing.CallDelayed(1, FinishLevel);
     }
     
-
-    public void LevelCompleted()
+    public void LevelFailed()
     {
-        OnLevelCompleted?.Invoke(loadedWorldNumber, loadedLevelNumber);
+        OnLevelFailed?.Invoke(loadedWorldNumber, loadedLevelNumber);
+        Timing.KillCoroutines(coroutinesTag);
     }
 
-    private void OnDestroy ()
+    void FinishLevel()
+    {
+        OnLevelFinished?.Invoke(loadedWorldNumber, loadedLevelNumber);
+    }
+
+    public void Terminate ()
     {
         Timing.KillCoroutines(coroutinesTag);
         registeredUpdates.Clear();
         registeredFixedUpdates.Clear();
         registeredLateUpdates.Clear();
         DestroyRotator();
-        instance = null;
+
+        UnloadCurrentLevel();
     }
 }

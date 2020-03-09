@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using MEC;
+using UnityEngine.SceneManagement;
 
 public class ApplicationManager : MonoBehaviour
 {
@@ -11,7 +12,7 @@ public class ApplicationManager : MonoBehaviour
 
     public static ApplicationManager Instance => instance ?? (instance = FindObjectOfType<ApplicationManager>());
 
-    GameManager gameManager;
+    public GameManager GameManager { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     public static void Initialize()
@@ -35,22 +36,24 @@ public class ApplicationManager : MonoBehaviour
         }
 
         GameObject.Find("Button_Unload").GetComponent<Button>().onClick.AddListener(ForceUnloadCurrentLevel);
+        GameObject.Find("Button_Pause").GetComponent<Button>().onClick.AddListener(ForceTogglePause);
     }
 
     public void OnLevelButtonClicked(int lvlNumber)
     {
-        GoFromMenuToGame(1, lvlNumber);
+        StartGameLevel(1, lvlNumber);
     }
 
-    public void GoFromMenuToGame(int worldNumber, int levelNumber)
+    public void StartGameLevel(int worldNumber, int levelNumber)
     {
-        if (gameManager != null)//level is already loaded
+        if (GameManager != null)//level is already loaded
             return;
-        gameManager = Instantiate(Resources.Load<GameManager>(Constants.GameManagerPrefabPath));
+
+        GameManager = Instantiate(Resources.Load<GameManager>(Constants.GameManagerPrefabPath));
 
         GameManager.Instance.StartNewLevel(worldNumber, levelNumber);
         GameManager.Instance.OnLevelGoalReached += OnLevelGoalReached;
-        GameManager.Instance.OnLevelCompleted += OnLevelCompleted;
+        GameManager.Instance.OnLevelFinished += OnLevelFinished;
     }
 
     private void OnLevelGoalReached (int worldNumber, int levelNumber)
@@ -58,30 +61,35 @@ public class ApplicationManager : MonoBehaviour
         //TODO show end game ui
     }
 
-    void OnLevelCompleted (int worldNumber, int levelNumber)
+    void OnLevelFinished (int worldNumber, int levelNumber)
     {
-        GoFromGameToMenu();
+        EndGameLevel();
 
-        Timing.CallDelayed(1, () => GoFromMenuToGame(worldNumber, ++levelNumber));
+        Timing.CallDelayed(1, () => StartGameLevel(worldNumber, ++levelNumber));
     }
 
-    public void GoFromGameToMenu()
+    public void EndGameLevel()
     {
-        if (GameManager.Instance == null)
+        if (GameManager == null)
             return;
 
-        GameManager.Instance.OnLevelGoalReached -= OnLevelGoalReached;
-        GameManager.Instance.OnLevelCompleted -= OnLevelCompleted;
+        GameManager.OnLevelGoalReached -= OnLevelGoalReached;
+        GameManager.OnLevelFinished -= OnLevelFinished;
 
-        GameManager.Instance.UnloadCurrentLevel();
+        GameManager.Terminate();
+        GameManager = null;
         
-        Destroy(gameManager.gameObject);
-        gameManager = null;
+        SceneManager.SetActiveScene(SceneManager.GetSceneByName("Application"));
     }
 
     public void ForceUnloadCurrentLevel()
     {
-        GoFromGameToMenu();
+        EndGameLevel();
+    }
+
+    public void ForceTogglePause ()
+    {
+        GameManager?.TogglePause();
     }
 
     void Update ()
@@ -90,7 +98,7 @@ public class ApplicationManager : MonoBehaviour
         for (int i = 49; i < 58; i++)
         {
             if (Input.GetKeyDown((KeyCode)i))
-                GoFromMenuToGame(1, i - 48);
+                StartGameLevel(1, i - 48);
         }
     }
 }
