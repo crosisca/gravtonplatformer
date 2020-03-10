@@ -64,7 +64,8 @@ public partial class GameManager : MonoBehaviour
 
     private void OnPlayerDeath ()
     {
-        Timing.CallDelayed(1, () => StartNewLevel(loadedWorldNumber, loadedLevelNumber));
+        
+        Timing.CallDelayed(1, FinishLevel);
     }
 
     void Start()
@@ -301,6 +302,7 @@ public partial class GameManager : MonoBehaviour
     public void Terminate ()
     {
         Debug.Log("GameManager.Terminate");
+        player.OnDeath -= OnPlayerDeath;
         Destroy(player);
         Destroy(playerCamera);
         Timing.KillCoroutines(coroutinesTag);
