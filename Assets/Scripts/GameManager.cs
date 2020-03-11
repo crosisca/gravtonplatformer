@@ -45,10 +45,6 @@ public partial class GameManager : MonoBehaviour
     /// <summary>
     /// WorldNumber, LevelNumber
     /// </summary>
-    public event Action<int,int> OnLevelFinished;
-    /// <summary>
-    /// WorldNumber, LevelNumber
-    /// </summary>
     public event Action<int, int> OnLevelFailed;
 
     const string coroutinesTag = "gameManager";
@@ -284,8 +280,6 @@ public partial class GameManager : MonoBehaviour
 
     public void LevelGoalReached(EndPoint goal)
     {
-        Timing.KillCoroutines(coroutinesTag);
-
         Debug.Log("OnLevelGoalReached");
         OnLevelGoalReached?.Invoke(loadedWorldNumber, loadedLevelNumber);
 
@@ -296,16 +290,9 @@ public partial class GameManager : MonoBehaviour
     {
         Debug.Log("OnLevelFailed");
         OnLevelFailed?.Invoke(loadedWorldNumber, loadedLevelNumber);
-        Timing.KillCoroutines(coroutinesTag);
         levelFailedPanel.Open();
     }
-
-    public void FinishLevel()
-    {
-        Debug.Log("OnLevelFinished");
-        OnLevelFinished?.Invoke(loadedWorldNumber, loadedLevelNumber);
-    }
-
+    
     public void Terminate ()
     {
         Debug.Log("GameManager.Terminate");

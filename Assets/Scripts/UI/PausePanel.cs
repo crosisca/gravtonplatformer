@@ -57,15 +57,7 @@ public class PausePanel : UIWindow
     }
     private void OnClickHome ()
     {
-        GameManager.Instance.FinishLevel();
+        ApplicationManager.Instance.GoToMenu();
         Close();
-    }
-
-    protected override void OnOpen ()
-    {
-    }
-
-    protected override void OnClose ()
-    {
     }
 }

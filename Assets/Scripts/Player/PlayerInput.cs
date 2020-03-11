@@ -29,8 +29,8 @@ public class PlayerInput : MonoBehaviour
 
         GameManager.Instance.OnLevelStarted += OnLevelStarted;
 	    GameManager.Instance.OnLevelFailed += OnLevelFailed;
-        GameManager.Instance.OnLevelFinished += OnLevelFinished;
-	    player.OnDeath += OnPlayerDeath;
+	    GameManager.Instance.OnLevelGoalReached += OnLevelGoalReached;
+        player.OnDeath += OnPlayerDeath;
 	}
 
     void OnLevelStarted ()
@@ -43,15 +43,10 @@ public class PlayerInput : MonoBehaviour
         inputActions.Disable();
     }
 
-    void OnLevelFinished (int worldNumber, int levelNumber)
-	{
-		inputActions.Disable();
-
-        GameManager.Instance.OnLevelStarted -= OnLevelStarted;
-	    GameManager.Instance.OnLevelFailed -= OnLevelFailed;
-        GameManager.Instance.OnLevelFinished -= OnLevelFinished;
-	    player.OnDeath -= OnPlayerDeath;
-	}
+    void OnLevelGoalReached (int arg1, int arg2)
+    {
+        inputActions.Disable();
+    }
 
     void OnPlayerDeath ()
     {
@@ -104,4 +99,14 @@ public class PlayerInput : MonoBehaviour
 
 		jumpHeld = jumpHeld || (!inputActions.PlayerActions.Jump.triggered && (inputActions.PlayerActions.Jump.ReadValue<float>() == 1));
 	}
+
+    void OnDestroy ()
+    {
+        inputActions.Disable();
+
+        GameManager.Instance.OnLevelStarted -= OnLevelStarted;
+        GameManager.Instance.OnLevelFailed -= OnLevelFailed;
+        GameManager.Instance.OnLevelGoalReached -= OnLevelGoalReached;
+        player.OnDeath -= OnPlayerDeath;
+    }
 }

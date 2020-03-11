@@ -18,6 +18,6 @@ public abstract class UIWindow : MonoBehaviour
         gameObject.SetActive(false);
     }
 
-    protected abstract void OnOpen();
-    protected abstract void OnClose();
+    protected virtual void OnOpen(){}
+    protected virtual void OnClose(){}
 }

@@ -24,12 +24,4 @@ public class LevelSelectionPanel : UIWindow
     {
         OnLevelSelected?.Invoke(1, lvlNumber);
     }
-
-    protected override void OnOpen ()
-    {
-    }
-
-    protected override void OnClose ()
-    {
-    }
 }

@@ -44,7 +44,7 @@ public class ApplicationManager : MonoBehaviour
         levelSelectionPanel.Close();
     }
 
-    public void StartGameLevel(int worldNumber, int levelNumber)
+    void StartGameLevel(int worldNumber, int levelNumber)
     {
         if (GameManager != null)//level is already loaded
             return;
@@ -52,16 +52,24 @@ public class ApplicationManager : MonoBehaviour
         GameManager = Instantiate(Resources.Load<GameManager>(Constants.GameManagerPrefabPath));
 
         GameManager.StartNewLevel(worldNumber, levelNumber);
-        GameManager.OnLevelFinished += OnLevelFinished;
 
         OnGameSessionStarted?.Invoke();
     }
-    
-    void OnLevelFinished (int worldNumber, int levelNumber)
+
+    public void GoToMenu()
     {
         EndGameLevel();
 
-        ShowMenu();//TODO vai ficar no botao de home ;)
+        ShowMenu();
+    }
+
+    public void GoToNextLevel ()
+    {
+        int curentWorldNumber = GameManager.Instance.loadedWorldNumber;
+        int nextLevelNumber = GameManager.Instance.loadedLevelNumber + 1;
+        EndGameLevel();
+
+        Timing.CallDelayed(Timing.WaitUntilTrue(() => GameManager == null), () => StartGameLevel(curentWorldNumber, nextLevelNumber));
     }
 
     public void EndGameLevel()
@@ -70,9 +78,7 @@ public class ApplicationManager : MonoBehaviour
             return;
 
         OnGameSessionFinished?.Invoke();
-
-        GameManager.OnLevelFinished -= OnLevelFinished;
-
+        
         GameManager.Terminate();
     }
 

@@ -42,6 +42,8 @@ public class PlayerMovement : MonoBehaviour
 
     public Transform Visual { get; private set; }
 
+    bool movementEnabled;
+
     public float DownwardsVelocity
     {
         get
@@ -87,33 +89,37 @@ public class PlayerMovement : MonoBehaviour
         GameManager.Instance.OnLevelStarted += OnLevelStarted;
         GameManager.Instance.OnLevelGoalReached += OnGoalreached;
         GameManager.Instance.OnLevelFailed += OnLevelFailed;
-        GameManager.Instance.OnLevelFinished += OnLevelFinished;
+    }
+
+    void ToggleMovement(bool enabled)
+    {
+        if (movementEnabled == enabled)
+            return;
+
+        movementEnabled = enabled;
+
+        rigidBody.isKinematic = !movementEnabled;
+        if (movementEnabled)
+            GameManager.Instance.AddFixedUpdate(OnFixedUpdate);
+        else
+            GameManager.Instance.RemoveFixedUpdate(OnFixedUpdate);
     }
 
     void OnLevelStarted()
     {
-        rigidBody.isKinematic = false;
-        GameManager.Instance.AddFixedUpdate(OnFixedUpdate);
+        ToggleMovement(true);
     }
 
     void OnGoalreached (int arg1, int arg2)
     {
-        rigidBody.isKinematic = true;
-        GameManager.Instance.RemoveFixedUpdate(OnFixedUpdate);
+        ToggleMovement(false);
     }
 
     void OnLevelFailed (int arg1, int arg2)
     {
-        rigidBody.isKinematic = true;
-        GameManager.Instance.RemoveFixedUpdate(OnFixedUpdate);
+        ToggleMovement(false);
     }
-
-    void OnLevelFinished (int arg1, int arg2)
-    {
-        rigidBody.isKinematic = true;
-        GameManager.Instance.RemoveFixedUpdate(OnFixedUpdate);
-    }
-
+    
     void OnFixedUpdate ()
     {
         if (GameManager.Instance.IsPaused)
@@ -302,7 +308,6 @@ public class PlayerMovement : MonoBehaviour
         GameManager.Instance.OnLevelStarted -= OnLevelStarted;
         GameManager.Instance.OnLevelFailed -= OnLevelFailed;
         GameManager.Instance.OnLevelGoalReached -= OnGoalreached;
-        GameManager.Instance.OnLevelFinished -= OnLevelFinished;
         GameManager.Instance.RemoveFixedUpdate(OnFixedUpdate);
     }
 }

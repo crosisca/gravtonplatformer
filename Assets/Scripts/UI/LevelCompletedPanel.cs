@@ -28,6 +28,7 @@ public class LevelCompletedPanel : UIWindow
     private void OnClickNextLevel ()
     {
         //TODO goto next level
+        ApplicationManager.Instance.GoToNextLevel();
     }
 
     private void OnClickRestart ()
@@ -37,15 +38,7 @@ public class LevelCompletedPanel : UIWindow
     }
     private void OnClickHome ()
     {
-        GameManager.Instance.FinishLevel();
+        ApplicationManager.Instance.GoToMenu();
         Close();
-    }
-
-    protected override void OnOpen ()
-    {
-    }
-
-    protected override void OnClose ()
-    {
     }
 }

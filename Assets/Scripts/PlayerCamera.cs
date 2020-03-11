@@ -19,7 +19,6 @@ public class PlayerCamera : MonoBehaviour
         GameManager.Instance.OnLevelFailed += OnLevelFailed;
         GameManager.Instance.OnLevelGoalReached += OnLevelGoalReached;
         GameManager.Instance.OnLevelLoadCompleted += OnLevelLoadCompleted;
-        GameManager.Instance.OnLevelFinished += OnLevelFinished;
     }
     
     void OnLevelLoadCompleted ()
@@ -50,19 +49,13 @@ public class PlayerCamera : MonoBehaviour
         if (!Application.isMobilePlatform)
             transform.rotation = player.transform.rotation;
     }
-
-    void OnLevelFinished (int worldNumber, int levelNumber)
-    {
-        GameManager.Instance.RemoveLateUpdate(OnLateUpdate);
-    }
-
+    
     private void OnDestroy ()
     {
         GameManager.Instance.OnLevelStarted -= OnLevelStarted;
         GameManager.Instance.OnLevelFailed -= OnLevelFailed;
         GameManager.Instance.OnLevelGoalReached -= OnLevelGoalReached;
         GameManager.Instance.OnLevelLoadCompleted -= OnLevelLoadCompleted;
-        GameManager.Instance.OnLevelFinished -= OnLevelFinished;
         GameManager.Instance.RemoveLateUpdate(OnLateUpdate);
     }
 }
