@@ -59,13 +59,14 @@ public partial class GameManager : MonoBehaviour
     CoroutineHandle unloadCoroutine;
 
     IngameHUDPanel hud;
+    LevelFailedPanel levelFailedPanel;
+    LevelCompletedPanel levelCompletedPanel;
 
     Canvas canvas;
 
     private void OnPlayerDeath ()
     {
-        
-        Timing.CallDelayed(1, RestartLevel);
+        Timing.CallDelayed(1, LevelFailed);
     }
 
     void Start()
@@ -217,6 +218,8 @@ public partial class GameManager : MonoBehaviour
         canvas = Instantiate(Resources.Load<Canvas>("IngameCanvas"));
 
         hud = Instantiate(Resources.Load<IngameHUDPanel>("IngameHUDPanel"), canvas.transform);
+        levelFailedPanel = Instantiate(Resources.Load<LevelFailedPanel>("LevelFailedPanel"), canvas.transform);
+        levelCompletedPanel = Instantiate(Resources.Load<LevelCompletedPanel>("LevelCompletedPanel"), canvas.transform);
 
         //HACK
         OnClickedStarLevel();//hack
@@ -284,13 +287,14 @@ public partial class GameManager : MonoBehaviour
 
         Timing.KillCoroutines(coroutinesTag);
 
-        Timing.CallDelayed(1, FinishLevel);
+        levelCompletedPanel.Open();
     }
     
     public void LevelFailed()
     {
         OnLevelFailed?.Invoke(loadedWorldNumber, loadedLevelNumber);
         Timing.KillCoroutines(coroutinesTag);
+        levelFailedPanel.Open();
     }
 
     public void FinishLevel()

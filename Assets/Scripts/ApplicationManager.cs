@@ -52,22 +52,16 @@ public class ApplicationManager : MonoBehaviour
         GameManager = Instantiate(Resources.Load<GameManager>(Constants.GameManagerPrefabPath));
 
         GameManager.StartNewLevel(worldNumber, levelNumber);
-        GameManager.OnLevelGoalReached += OnLevelGoalReached;
         GameManager.OnLevelFinished += OnLevelFinished;
 
         OnGameSessionStarted?.Invoke();
     }
-
-    private void OnLevelGoalReached (int worldNumber, int levelNumber)
-    {
-        //TODO show end game ui
-    }
-
+    
     void OnLevelFinished (int worldNumber, int levelNumber)
     {
         EndGameLevel();
 
-        ShowMenu();
+        //ShowMenu();//TODO vai ficar no botao de home ;)
     }
 
     public void EndGameLevel()
@@ -77,7 +71,6 @@ public class ApplicationManager : MonoBehaviour
 
         OnGameSessionFinished?.Invoke();
 
-        GameManager.OnLevelGoalReached -= OnLevelGoalReached;
         GameManager.OnLevelFinished -= OnLevelFinished;
 
         GameManager.Terminate();
