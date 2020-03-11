@@ -84,13 +84,34 @@ public class PlayerMovement : MonoBehaviour
 
         Visual = transform.Find("Gravton_Character");
 
-        GameManager.Instance.AddFixedUpdate(OnFixedUpdate);
+        GameManager.Instance.OnLevelStarted += OnLevelStarted;
         GameManager.Instance.OnLevelGoalReached += OnGoalreached;
+        GameManager.Instance.OnLevelFailed += OnLevelFailed;
+        GameManager.Instance.OnLevelFinished += OnLevelFinished;
     }
 
-    private void OnGoalreached (int arg1, int arg2)
+    void OnLevelStarted()
+    {
+        rigidBody.isKinematic = false;
+        GameManager.Instance.AddFixedUpdate(OnFixedUpdate);
+    }
+
+    void OnGoalreached (int arg1, int arg2)
     {
         rigidBody.isKinematic = true;
+        GameManager.Instance.RemoveFixedUpdate(OnFixedUpdate);
+    }
+
+    void OnLevelFailed (int arg1, int arg2)
+    {
+        rigidBody.isKinematic = true;
+        GameManager.Instance.RemoveFixedUpdate(OnFixedUpdate);
+    }
+
+    void OnLevelFinished (int arg1, int arg2)
+    {
+        rigidBody.isKinematic = true;
+        GameManager.Instance.RemoveFixedUpdate(OnFixedUpdate);
     }
 
     void OnFixedUpdate ()
@@ -278,7 +299,10 @@ public class PlayerMovement : MonoBehaviour
 
     private void OnDestroy ()
     {
+        GameManager.Instance.OnLevelStarted -= OnLevelStarted;
+        GameManager.Instance.OnLevelFailed -= OnLevelFailed;
         GameManager.Instance.OnLevelGoalReached -= OnGoalreached;
+        GameManager.Instance.OnLevelFinished -= OnLevelFinished;
         GameManager.Instance.RemoveFixedUpdate(OnFixedUpdate);
     }
 }

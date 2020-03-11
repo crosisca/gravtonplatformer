@@ -91,6 +91,7 @@ public partial class GameManager : MonoBehaviour
     
     IEnumerator<float> RotateWorldCoroutine(int targetAngle, bool instant = false)
     {
+        Debug.Log("Start rotating" + Player.transform.eulerAngles);
         canChangeRotation = false;
         IsRotating = true;
 
@@ -119,6 +120,7 @@ public partial class GameManager : MonoBehaviour
 
         Player.transform.rotation = Quaternion.Euler(0, 0, targetAngle);
         currentAngle = Clamp0360(targetAngle);
+        Debug.Log("End rotating" + Player.transform.eulerAngles);
     }
 
     public static int Clamp0360 (int eulerAngles)

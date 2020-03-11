@@ -134,6 +134,7 @@ public partial class GameManager : MonoBehaviour
         else
             IsPaused = !IsPaused;
 
+        Debug.Log("OnPauseChanged:" + IsPaused);
         OnPauseChanged?.Invoke(IsPaused);
         return IsPaused;
     }
@@ -179,12 +180,7 @@ public partial class GameManager : MonoBehaviour
 
     public void RestartLevel()
     {
-        Player.GoToSpawnPoint();
-        RotateWorld(0, true);
-        TogglePause(false);
-        //TODO show start lvl ui
-        //HACK
-        OnClickedStarLevel();//hack
+        StartLevel();
     }
 
     IEnumerator<float> LoadLevelCoroutine (int world, int level)
@@ -210,6 +206,7 @@ public partial class GameManager : MonoBehaviour
 
         yield return Timing.WaitForOneFrame;
 
+        Debug.Log("OnLevelLoadCompleted");
         OnLevelLoadCompleted?.Invoke();
 
         yield return Timing.WaitForOneFrame;
@@ -220,13 +217,17 @@ public partial class GameManager : MonoBehaviour
         hud = Instantiate(Resources.Load<IngameHUDPanel>("IngameHUDPanel"), canvas.transform);
         levelFailedPanel = Instantiate(Resources.Load<LevelFailedPanel>("LevelFailedPanel"), canvas.transform);
         levelCompletedPanel = Instantiate(Resources.Load<LevelCompletedPanel>("LevelCompletedPanel"), canvas.transform);
-
-        //HACK
-        OnClickedStarLevel();//hack
+        
+        StartLevel();
     }
 
-    void OnClickedStarLevel()
+    void StartLevel()
     {
+        Debug.Log("Start Level");
+        Player.GoToSpawnPoint();
+        RotateWorld(0, true);
+        TogglePause(false);
+        Debug.Log("OnLevelStarted");
         OnLevelStarted?.Invoke();
     }
 
@@ -283,15 +284,17 @@ public partial class GameManager : MonoBehaviour
 
     public void LevelGoalReached(EndPoint goal)
     {
-        OnLevelGoalReached?.Invoke(loadedWorldNumber, loadedLevelNumber);
-
         Timing.KillCoroutines(coroutinesTag);
+
+        Debug.Log("OnLevelGoalReached");
+        OnLevelGoalReached?.Invoke(loadedWorldNumber, loadedLevelNumber);
 
         levelCompletedPanel.Open();
     }
     
     public void LevelFailed()
     {
+        Debug.Log("OnLevelFailed");
         OnLevelFailed?.Invoke(loadedWorldNumber, loadedLevelNumber);
         Timing.KillCoroutines(coroutinesTag);
         levelFailedPanel.Open();
@@ -299,7 +302,7 @@ public partial class GameManager : MonoBehaviour
 
     public void FinishLevel()
     {
-        Debug.Log("GameManager.FinishLevel -> OnLevelFinished.Invoke");
+        Debug.Log("OnLevelFinished");
         OnLevelFinished?.Invoke(loadedWorldNumber, loadedLevelNumber);
     }
 

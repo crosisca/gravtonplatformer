@@ -61,7 +61,7 @@ public class ApplicationManager : MonoBehaviour
     {
         EndGameLevel();
 
-        //ShowMenu();//TODO vai ficar no botao de home ;)
+        ShowMenu();//TODO vai ficar no botao de home ;)
     }
 
     public void EndGameLevel()
