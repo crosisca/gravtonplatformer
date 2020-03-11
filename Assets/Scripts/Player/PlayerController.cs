@@ -6,8 +6,8 @@ using MEC;
 
 public class PlayerController : MonoBehaviour
 {
-    public Action OnDeath;
-    public Action OnDeathCompleted;
+    public event Action OnDeath;
+    //public event Action OnDeathCompleted;
 
     public PlayerMovement Movement { get; private set; }
 

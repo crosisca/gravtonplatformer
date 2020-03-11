@@ -8,6 +8,6 @@ public class InstantKillHazard : MapItem
     protected override void OnTriggerEnter2D (Collider2D collision)
     {
         if (collision.CompareTag("Player"))
-            collision.GetComponent<PlayerController>().Kill(DeathReason);
+            GameManager.Instance.Player.Kill(DeathReason);
     }
 }

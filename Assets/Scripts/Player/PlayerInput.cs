@@ -20,28 +20,45 @@ public class PlayerInput : MonoBehaviour
 
 	PlayerInputActions inputActions;
 
+    PlayerController player;
+
 	private void Awake()
 	{
 		inputActions = new PlayerInputActions();
+	    player = GetComponent<PlayerController>();
 
-		GameManager.Instance.OnLevelStarted += OnLevelStarted;
-		GameManager.Instance.OnLevelFinished += OnLevelFinished;
+        GameManager.Instance.OnLevelStarted += OnLevelStarted;
+	    GameManager.Instance.OnLevelFailed += OnLevelFailed;
+        GameManager.Instance.OnLevelFinished += OnLevelFinished;
+	    player.OnDeath += OnPlayerDeath;
 	}
 
-	private void OnLevelStarted ()
+    void OnLevelStarted ()
 	{
 		inputActions.Enable();
 	}
 
-	void OnLevelFinished (int worldNumber, int levelNumber)
+    void OnLevelFailed (int arg1, int arg2)
+    {
+        inputActions.Disable();
+    }
+
+    void OnLevelFinished (int worldNumber, int levelNumber)
 	{
 		inputActions.Disable();
 
-		GameManager.Instance.OnLevelStarted -= OnLevelStarted;
-		GameManager.Instance.OnLevelFinished -= OnLevelFinished;
+        GameManager.Instance.OnLevelStarted -= OnLevelStarted;
+	    GameManager.Instance.OnLevelFailed -= OnLevelFailed;
+        GameManager.Instance.OnLevelFinished -= OnLevelFinished;
+	    player.OnDeath -= OnPlayerDeath;
 	}
 
-	void Update()
+    void OnPlayerDeath ()
+    {
+        inputActions.Disable();
+    }
+
+    void Update()
 	{
 		//Clear out existing input values
 		ClearInput();

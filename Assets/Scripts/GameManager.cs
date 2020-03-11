@@ -27,7 +27,7 @@ public partial class GameManager : MonoBehaviour
     public int loadedWorldNumber;
     public int loadedLevelNumber;
 
-    PlayerController player;
+    public PlayerController Player { get; private set; }
     PlayerCamera playerCamera;
 
     CoroutineHandle startLevelCoroutine;
@@ -65,7 +65,7 @@ public partial class GameManager : MonoBehaviour
     private void OnPlayerDeath ()
     {
         
-        Timing.CallDelayed(1, FinishLevel);
+        Timing.CallDelayed(1, RestartLevel);
     }
 
     void Start()
@@ -178,7 +178,7 @@ public partial class GameManager : MonoBehaviour
 
     public void RestartLevel()
     {
-        player.GoToSpawnPoint();
+        Player.GoToSpawnPoint();
         RotateWorld(0, true);
         TogglePause(false);
         //TODO show start lvl ui
@@ -195,13 +195,13 @@ public partial class GameManager : MonoBehaviour
 
         yield return Timing.WaitForOneFrame;
 
-        player = Instantiate(Resources.Load<PlayerController>(Constants.PlayerPrefabPath), Vector3.zero, Quaternion.identity);
-        player.OnDeath += OnPlayerDeath;
-        player.GoToSpawnPoint();
+        Player = Instantiate(Resources.Load<PlayerController>(Constants.PlayerPrefabPath), Vector3.zero, Quaternion.identity);
+        Player.OnDeath += OnPlayerDeath;
+        Player.GoToSpawnPoint();
 
         yield return Timing.WaitForOneFrame;
 
-        playerCamera = Instantiate(Resources.Load<PlayerCamera>(Constants.PlayerFollowCameraPrefabPath), player.transform.position, Quaternion.identity);
+        playerCamera = Instantiate(Resources.Load<PlayerCamera>(Constants.PlayerFollowCameraPrefabPath), Player.transform.position, Quaternion.identity);
 
         yield return Timing.WaitForOneFrame;
 
@@ -260,8 +260,8 @@ public partial class GameManager : MonoBehaviour
         if(playerCamera != null)
             Destroy(playerCamera.gameObject);
 
-        if(player != null)
-            Destroy(player.gameObject);
+        if(Player != null)
+            Destroy(Player.gameObject);
 
         AsyncOperation unloadLevelOperation = SceneManager.UnloadSceneAsync(activeLevel);
 
@@ -302,8 +302,8 @@ public partial class GameManager : MonoBehaviour
     public void Terminate ()
     {
         Debug.Log("GameManager.Terminate");
-        player.OnDeath -= OnPlayerDeath;
-        Destroy(player);
+        Player.OnDeath -= OnPlayerDeath;
+        Destroy(Player);
         Destroy(playerCamera);
         Timing.KillCoroutines(coroutinesTag);
         registeredUpdates.Clear();

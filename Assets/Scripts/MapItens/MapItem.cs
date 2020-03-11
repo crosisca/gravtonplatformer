@@ -4,6 +4,11 @@ public class MapItem : MonoBehaviour
 {
     public bool Active { get;private set; } = false;
 
+    public virtual void Awake () { }
+    public virtual void Start () { }
+
+    protected Vector2 Position2d => transform.position.AsVector2();
+
     protected virtual void OnLevelStarted()
     {
         Active = true;

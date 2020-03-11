@@ -54,7 +54,7 @@ public partial class GameManager : MonoBehaviour
     private void OnLevelStart ()
     {
         canChangeRotation = true;
-        player.Movement.OnLand += OnPlayerLand;
+        Player.Movement.OnLand += OnPlayerLand;
     }
 
     private void OnPlayerLand ()
@@ -109,7 +109,7 @@ public partial class GameManager : MonoBehaviour
                 t += Timing.DeltaTime * worldRotationSpeed;
                 int lerpAngle = Clamp0360((int)Mathf.LerpAngle(initialAngle, targetAngle, t));
 
-                player.transform.eulerAngles = new Vector3(0, 0, lerpAngle);
+                Player.transform.eulerAngles = new Vector3(0, 0, lerpAngle);
 
                 yield return Timing.WaitForOneFrame;
             }
@@ -117,7 +117,7 @@ public partial class GameManager : MonoBehaviour
         
         IsRotating = false;
 
-        player.transform.rotation = Quaternion.Euler(0, 0, targetAngle);
+        Player.transform.rotation = Quaternion.Euler(0, 0, targetAngle);
         currentAngle = Clamp0360(targetAngle);
     }
 
@@ -143,7 +143,7 @@ public partial class GameManager : MonoBehaviour
     //}
     void DestroyRotator ()
     {
-        player.Movement.OnLand -= OnPlayerLand;
+        Player.Movement.OnLand -= OnPlayerLand;
         RemoveUpdate(CheckRotationInputs);
     }
 }

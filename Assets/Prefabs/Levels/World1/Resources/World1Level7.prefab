@@ -4805,6 +4805,7 @@ GameObject:
   - component: {fileID: 3441276283942577225}
   - component: {fileID: 3088525307054154536}
   - component: {fileID: 6728369179316164395}
+  - component: {fileID: 2838765196713988868}
   m_Layer: 0
   m_Name: Spikes
   m_TagString: Untagged
@@ -5223,6 +5224,18 @@ CompositeCollider2D:
       - {x: 19, y: -12.000058}
   m_VertexDistance: 0.0005
   m_OffsetDistance: 0.00005
+--- !u!114 &2838765196713988868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8817787925622598557}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b26510247616f7042b12bfad6e7afaa3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &109156744721033635
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5610,15 +5623,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d14ca421bfbe41b4792a94c34e9bbd6e, type: 3}
---- !u!61 &4198376532808029404 stripped
-BoxCollider2D:
-  m_CorrespondingSourceObject: {fileID: 3700621743290161507, guid: d14ca421bfbe41b4792a94c34e9bbd6e,
-    type: 3}
-  m_PrefabInstance: {fileID: 655448465181920703}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5064547486327865616 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5715206409916107951, guid: d14ca421bfbe41b4792a94c34e9bbd6e,
+    type: 3}
+  m_PrefabInstance: {fileID: 655448465181920703}
+  m_PrefabAsset: {fileID: 0}
+--- !u!61 &4198376532808029404 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 3700621743290161507, guid: d14ca421bfbe41b4792a94c34e9bbd6e,
     type: 3}
   m_PrefabInstance: {fileID: 655448465181920703}
   m_PrefabAsset: {fileID: 0}
