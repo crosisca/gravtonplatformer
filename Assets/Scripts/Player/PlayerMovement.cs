@@ -64,6 +64,26 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
+    public float LateralVelocity
+    {
+        get
+        {
+            switch (GameManager.Instance.GravityDirection)
+            {
+                case GravityDirection.UP:
+                    return -rigidBody.velocity.x;
+                case GravityDirection.DOWN:
+                    return rigidBody.velocity.x;
+                case GravityDirection.RIGHT:
+                    return rigidBody.velocity.y;
+                case GravityDirection.LEFT:
+                    return -rigidBody.velocity.y;
+                default:
+                    return 0;
+            }
+        }
+    }
+
 
     [SerializeField]
     float fallingSpeed;
@@ -71,7 +91,7 @@ public class PlayerMovement : MonoBehaviour
     GravityDirection gravityDirection;
     private void Awake()
     {
-        groundLayer = LayerMask.GetMask("Ground");
+        groundLayer = LayerMask.GetMask("Ground","Platform");
     }
 
     void Start ()
@@ -125,14 +145,49 @@ public class PlayerMovement : MonoBehaviour
         if (GameManager.Instance.IsPaused)
             return;
 
+        //Runtime disable friction
+        //if(input.horizontal != 0)
+        //{
+        //    rigidBody.sharedMaterial.friction = 0;
+        //}
+        //else
+        //    rigidBody.sharedMaterial.friction = 50;
+
         //Check the environment to determine status
         PhysicsCheck();
 
         //Process ground and air movements
-        GroundMovement();
-        MidAirMovement();
+        HorizontalMovement();
+        VerticalMovement();
 
         UpdateDebugVars();
+
+        //Limit horizontal velocity
+        //LimitLateralVelocity()
+    }
+
+    void LimitLateralVelocity()
+    {
+        Debug.Log(LateralVelocity);
+        float maxLateralVelocity = 5;
+        if (Mathf.Abs(LateralVelocity) > maxLateralVelocity)
+        {
+            switch (GameManager.Instance.GravityDirection)
+            {
+                case GravityDirection.DOWN:
+                    rigidBody.velocity = new Vector2(maxLateralVelocity * Mathf.Sign(LateralVelocity), rigidBody.velocity.y);
+                    break;
+                case GravityDirection.UP:
+                    rigidBody.velocity = new Vector2(-maxLateralVelocity * Mathf.Sign(LateralVelocity), rigidBody.velocity.y);
+                    break;
+                case GravityDirection.RIGHT:
+                    rigidBody.velocity = new Vector2(rigidBody.velocity.x, maxLateralVelocity * Mathf.Sign(LateralVelocity));
+                    break;
+                case GravityDirection.LEFT:
+                    rigidBody.velocity = new Vector2(rigidBody.velocity.x, -maxLateralVelocity * Mathf.Sign(LateralVelocity));
+                    break;
+            }
+        }
     }
 
     void UpdateDebugVars()
@@ -166,9 +221,10 @@ public class PlayerMovement : MonoBehaviour
         //}
     }
 
-    void GroundMovement ()
+    void HorizontalMovement ()
     {
         //Calculate the desired velocity based on inputs
+        Debug.Log("a linha abaixo reseta a speed aumentada pela plataforma(usar modifier stacks?)");
         float horizontalVelocity = speed * input.horizontal;
 
         //If the sign of the velocity and direction don't match, flip the character
@@ -182,6 +238,7 @@ public class PlayerMovement : MonoBehaviour
         }
 
         SetLocalHorizontalVelocity(horizontalVelocity);
+
         //If the player is on the ground, extend the coyote time window
         if (isOnGround)
             coyoteTime = Time.time + coyoteDuration;
@@ -192,15 +249,19 @@ public class PlayerMovement : MonoBehaviour
         switch (GameManager.Instance.GravityDirection)
         {
             case GravityDirection.DOWN:
+                //rigidBody.AddForce(new Vector2(horizontalVel, 0), ForceMode2D.Impulse);
                 rigidBody.velocity = new Vector2(horizontalVel, rigidBody.velocity.y);
                 break;
             case GravityDirection.UP:
+                //rigidBody.AddForce(new Vector2(-horizontalVel, 0), ForceMode2D.Impulse);
                 rigidBody.velocity = new Vector2(-horizontalVel, rigidBody.velocity.y);
                 break;
             case GravityDirection.RIGHT:
+                //rigidBody.AddForce(new Vector2(0, horizontalVel), ForceMode2D.Impulse);
                 rigidBody.velocity = new Vector2(rigidBody.velocity.x, horizontalVel);
                 break;
             case GravityDirection.LEFT:
+                //rigidBody.AddForce(new Vector2(0, -horizontalVel), ForceMode2D.Impulse);
                 rigidBody.velocity = new Vector2(rigidBody.velocity.x, -horizontalVel);
                 break;
         }
@@ -225,7 +286,7 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    void MidAirMovement ()
+    void VerticalMovement ()
     {
         //If the jump key is pressed AND the player isn't already jumping AND EITHER
         //the player is on the ground or within the coyote time window...

@@ -20,6 +20,8 @@ public class MovingPlatform : MapItem
     Rigidbody2D rb;
     Vector2 forwardDirection;
 
+    List<Rigidbody2D> collidingObjects = new List<Rigidbody2D>();
+
     public override void Awake()
     {
         base.Awake();
@@ -47,10 +49,30 @@ public class MovingPlatform : MapItem
     {
         base.OnFixedUpdate();
         Vector2 targetPosition = direction == 1 ? endPosition : startPosition;
-        
-        rb.MovePosition(Vector2.MoveTowards(Position2d, targetPosition, speed * Time.fixedDeltaTime));
+
+        //rb.MovePosition(Vector2.MoveTowards(Position2d, targetPosition, speed * Time.fixedDeltaTime));
+        rb.velocity = (targetPosition - Position2d).normalized * speed;
 
         if (Vector2.Distance(transform.position.AsVector2(), targetPosition) < speed * Time.fixedDeltaTime)
             direction = -direction;
+
+        for (int i = 0; i < collidingObjects.Count; i++)
+        {
+            Debug.Log("Essa ideia parece funcionar porem o player esta resetando (usar modifier stacks?)");
+            collidingObjects[i].velocity += rb.velocity;
+        }
+    }
+
+    protected override void OnCollisionEnter2D(Collision2D collision)
+    {
+        base.OnCollisionEnter2D(collision);
+
+        if (180 - Mathf.Abs(Vector3.Angle(transform.up, collision.contacts[0].normal)) < 90)
+            collidingObjects.Add(collision.rigidbody);
+    }
+
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        collidingObjects.Remove(collision.rigidbody);
     }
 }

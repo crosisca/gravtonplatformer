@@ -10,10 +10,10 @@ using UnityEngine;
 public class PlayerInput : MonoBehaviour
 {
 	public float horizontal;      //Float that stores horizontal input
-	public bool jumpHeld;         //Bool that stores jump pressed
+	//public bool jumpHeld;         //Bool that stores jump pressed
 	public bool jumpPressed;      //Bool that stores jump held
-	public bool crouchHeld;       //Bool that stores crouch pressed
-	public bool crouchPressed;    //Bool that stores crouch held
+	//public bool crouchHeld;       //Bool that stores crouch pressed
+	//public bool crouchPressed;    //Bool that stores crouch held
 
 	bool readyToClear;                              //Bool used to keep input in sync
 
@@ -55,12 +55,7 @@ public class PlayerInput : MonoBehaviour
 
     void Update()
 	{
-		//Clear out existing input values
 		ClearInput();
-
-		//If the Game Manager says the game is over, exit
-		//if (GameManager.IsGameOver())
-		//	return;
 
 		ProcessInputs();
 
@@ -84,9 +79,9 @@ public class PlayerInput : MonoBehaviour
 		//Reset all inputs
 		horizontal = 0f;
 		jumpPressed = false;
-		jumpHeld = false;
-		crouchPressed = false;
-		crouchHeld = false;
+		//jumpHeld = false;
+		//crouchPressed = false;
+		//crouchHeld = false;
 
 		readyToClear = false;
 	}
@@ -97,7 +92,7 @@ public class PlayerInput : MonoBehaviour
 
 		jumpPressed = jumpPressed || inputActions.PlayerActions.Jump.triggered;
 
-		jumpHeld = jumpHeld || (!inputActions.PlayerActions.Jump.triggered && (inputActions.PlayerActions.Jump.ReadValue<float>() == 1));
+		//jumpHeld = jumpHeld || (!inputActions.PlayerActions.Jump.triggered && (inputActions.PlayerActions.Jump.ReadValue<float>() == 1));
 	}
 
     void OnDestroy ()

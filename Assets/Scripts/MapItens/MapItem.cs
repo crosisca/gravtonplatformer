@@ -59,6 +59,12 @@ public class MapItem : MonoBehaviour
             return;
     }
 
+    protected virtual void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (!Active)
+            return;
+    }
+
     protected virtual void OnTriggerEnter2D (Collider2D collision)
     {
         if (!Active) 
