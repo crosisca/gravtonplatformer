@@ -219,7 +219,6 @@ public partial class GameManager : MonoBehaviour
 
     void StartLevel()
     {
-        Debug.Log("Start Level");
         Player.GoToSpawnPoint();
         RotateWorld(0, true);
         TogglePause(false);
