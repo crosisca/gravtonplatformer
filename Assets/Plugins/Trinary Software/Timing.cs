@@ -6467,46 +6467,46 @@ namespace MEC
         public new void StopAllCoroutines() {}
 
         [System.Obsolete("Use your own GameObject for this.", true)]
-        public new static void Destroy(Object obj) { }
+        public static new void Destroy(Object obj) { }
 
         [System.Obsolete("Use your own GameObject for this.", true)]
-        public new static void Destroy(Object obj, float f) { }
+        public static new void Destroy(Object obj, float f) { }
 
         [System.Obsolete("Use your own GameObject for this.", true)]
-        public new static void DestroyObject(Object obj) { }
+        public static new void DestroyObject(Object obj) { }
 
         [System.Obsolete("Use your own GameObject for this.", true)]
-        public new static void DestroyObject(Object obj, float f) { }
+        public static new void DestroyObject(Object obj, float f) { }
 
         [System.Obsolete("Use your own GameObject for this.", true)]
-        public new static void DestroyImmediate(Object obj) { }
+        public static new void DestroyImmediate(Object obj) { }
 
         [System.Obsolete("Use your own GameObject for this.", true)]
-        public new static void DestroyImmediate(Object obj, bool b) { }
+        public static new void DestroyImmediate(Object obj, bool b) { }
 
         [System.Obsolete("Use your own GameObject for this.", true)]
-        public new static void Instantiate(Object obj) { }
+        public static new void Instantiate(Object obj) { }
 
         [System.Obsolete("Use your own GameObject for this.", true)]
-        public new static void Instantiate(Object original, Vector3 position, Quaternion rotation) { }
+        public static new void Instantiate(Object original, Vector3 position, Quaternion rotation) { }
 
         [System.Obsolete("Use your own GameObject for this.", true)]
-        public new static void Instantiate<T>(T original) where T : Object { }
+        public static new void Instantiate<T>(T original) where T : Object { }
 
         [System.Obsolete("Just.. no.", true)]
-        public new static T FindObjectOfType<T>() where T : Object { return null; }
+        public static new T FindObjectOfType<T>() where T : Object { return null; }
 
         [System.Obsolete("Just.. no.", true)]
-        public new static Object FindObjectOfType(System.Type t) { return null; }
+        public static new Object FindObjectOfType(System.Type t) { return null; }
 
         [System.Obsolete("Just.. no.", true)]
-        public new static T[] FindObjectsOfType<T>() where T : Object { return null; }
+        public static new T[] FindObjectsOfType<T>() where T : Object { return null; }
 
         [System.Obsolete("Just.. no.", true)]
-        public new static Object[] FindObjectsOfType(System.Type t) { return null; }
+        public static new Object[] FindObjectsOfType(System.Type t) { return null; }
 
         [System.Obsolete("Just.. no.", true)]
-        public new static void print(object message) { }
+        public static new void print(object message) { }
     }
 
     /// <summary>
@@ -6601,7 +6601,7 @@ namespace MEC
     public struct CoroutineHandle : System.IEquatable<CoroutineHandle>
     {
         private const byte ReservedSpace = 0x0F;
-        private readonly static int[] NextIndex = { ReservedSpace + 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+        private static readonly int[] NextIndex = { ReservedSpace + 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
         private readonly int _id;
 
         public byte Key { get { return (byte)(_id & ReservedSpace); } }

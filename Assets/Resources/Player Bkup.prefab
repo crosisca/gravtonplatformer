@@ -14,8 +14,6 @@ GameObject:
   - component: {fileID: 4228821929134307502}
   - component: {fileID: 4228821929134307503}
   - component: {fileID: 8863068589365566143}
-  - component: {fileID: 3316178652460297238}
-  - component: {fileID: 3008853377544411212}
   m_Layer: 9
   m_Name: Player
   m_TagString: Player
@@ -92,7 +90,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4228821929134307490}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6016f62808751f643a70c2649158396e, type: 3}
   m_Name: 
@@ -139,40 +137,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   LandSpeedLimit: 15
---- !u!114 &3316178652460297238
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4228821929134307490}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 64bade3b7a78e4149880d29ec6f0a00d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  gravity: 50
-  maxHorizontalSpeed: 10
-  jumpSpeed: 15
-  acceleration: 100
-  deceleration: 100
---- !u!114 &3008853377544411212
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4228821929134307490}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 941587214dd05f04ea9a54c1cbcccc35, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  groundedLayerMask:
-    serializedVersion: 2
-    m_Bits: 1280
-  groundedRaycastDistance: 0.1
-  footOffset: 0.2
 --- !u!1 &4228821929913319828
 GameObject:
   m_ObjectHideFlags: 0

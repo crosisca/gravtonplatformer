@@ -55,6 +55,7 @@ public class MapItem : MonoBehaviour
 
     protected virtual void OnFixedUpdate()
     {
+        Debug.Log($"{name} MapItem fixed update");
         if (!Active || GameManager.Instance.IsPaused) 
             return;
     }
