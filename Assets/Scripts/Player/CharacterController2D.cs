@@ -21,6 +21,7 @@ public class CharacterController2D : MonoBehaviour
 
     public bool IsGrounded { get; protected set; }
     public bool IsCeilinged { get; protected set; }
+    [SerializeField]
     public Vector2 Velocity { get; protected set; }
 
     public float DownwardsVelocity
@@ -30,13 +31,13 @@ public class CharacterController2D : MonoBehaviour
             switch (GameManager.Instance.GravityDirection)
             {
                 case GravityDirection.UP:
-                    return m_Rigidbody2D.velocity.y;
+                    return Velocity.y;
                 case GravityDirection.DOWN:
-                    return -m_Rigidbody2D.velocity.y;
+                    return -Velocity.y;
                 case GravityDirection.RIGHT:
-                    return m_Rigidbody2D.velocity.x;
+                    return Velocity.x;
                 case GravityDirection.LEFT:
-                    return -m_Rigidbody2D.velocity.x;
+                    return -Velocity.x;
                 default:
                     return 0;
             }

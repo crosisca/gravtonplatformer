@@ -119,7 +119,6 @@ public class PlayerController : MonoBehaviour
             characterController.IsCeilinged && localMoveVector.y > 0f ||
             characterController.IsGrounded && localMoveVector.y < -gravity * Time.fixedDeltaTime)
         {
-            Debug.Log("Zeroed out move vector Y");
             localMoveVector.y = 0f;
         }
         
@@ -127,7 +126,6 @@ public class PlayerController : MonoBehaviour
         
         if (localMoveVector.y < -MaxFallSpeed)
         {
-            Debug.Log("Limiting max fall speed");
             localMoveVector.y = -MaxFallSpeed;
         }
     }
@@ -151,7 +149,7 @@ public class PlayerController : MonoBehaviour
         if (characterController.DownwardsVelocity > LandSpeedLimit)
         {
             Debug.Log($"Death by FALL. LandSpeedLimit: {LandSpeedLimit}");
-            //Kill(DeathReason.HIGH_FALL);
+            Kill(DeathReason.HIGH_FALL);
         }
     }
 

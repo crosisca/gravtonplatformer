@@ -115,8 +115,8 @@ MonoBehaviour:
   jumpSpeed: 13.5
   acceleration: 500
   deceleration: 500
-  LandSpeedLimit: 15
-  MaxFallSpeed: 20
+  LandSpeedLimit: 20
+  MaxFallSpeed: 25
 --- !u!114 &3008853377544411212
 MonoBehaviour:
   m_ObjectHideFlags: 0
