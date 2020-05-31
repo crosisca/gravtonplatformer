@@ -54,7 +54,7 @@ public partial class GameManager : MonoBehaviour
     private void OnLevelStart ()
     {
         canChangeRotation = true;
-        Player.Movement.OnLand += OnPlayerLand;
+        Player.CharacterController.OnLand += OnPlayerLand;
     }
 
     private void OnPlayerLand ()
@@ -143,7 +143,7 @@ public partial class GameManager : MonoBehaviour
     //}
     void DestroyRotator ()
     {
-        Player.Movement.OnLand -= OnPlayerLand;
+        Player.CharacterController.OnLand -= OnPlayerLand;
         RemoveUpdate(CheckRotationInputs);
     }
 }

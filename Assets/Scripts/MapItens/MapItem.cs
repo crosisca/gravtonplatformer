@@ -31,7 +31,7 @@ public class MapItem : MonoBehaviour
         Deactivate();
     }
 
-    void Activate()
+    protected void Activate ()
     {
         Active = true;
 
@@ -39,7 +39,7 @@ public class MapItem : MonoBehaviour
         GameManager.Instance.AddFixedUpdate(OnFixedUpdate);
     }
     
-    void Deactivate()
+    protected void Deactivate()
     {
         Active = false;
 
@@ -55,7 +55,6 @@ public class MapItem : MonoBehaviour
 
     protected virtual void OnFixedUpdate()
     {
-        Debug.Log($"{name} MapItem fixed update");
         if (!Active || GameManager.Instance.IsPaused) 
             return;
     }

@@ -7,19 +7,137 @@ using MEC;
 public class PlayerController : MonoBehaviour
 {
     public event Action OnDeath;
-    //public event Action OnDeathCompleted;
 
-    public PlayerMovement Movement { get; private set; }
+    public Vector2 LocalMoveVector => localMoveVector;
+
+    [SerializeField]//debug only
+    Vector2 localMoveVector;
 
     [SerializeField]
-    float LandSpeedLimit = 15;
+    float gravity = 50;
 
-    private void Awake ()
+    [SerializeField]
+    float maxHorizontalSpeed = 50;
+
+    [SerializeField]
+    float jumpSpeed = 10;
+
+    [SerializeField]
+    float acceleration = 100f;
+    [SerializeField]
+    float deceleration = 100f;
+
+    [SerializeField]
+    float LandSpeedLimit = 20;
+
+    [SerializeField]
+    float MaxFallSpeed = 30;
+
+
+    PlayerInput input;
+    CharacterController2D characterController;
+    public CharacterController2D CharacterController => characterController;
+
+    bool movementEnabled;
+
+    protected const float k_GroundedStickingVelocityMultiplier = 3f;    // This is to help the character stick to vertically moving platforms.
+
+    void Awake ()
     {
-        Movement = GetComponent<PlayerMovement>();
-        Movement.OnLand += OnLand;
+        input = GetComponent<PlayerInput>();
+        characterController = GetComponent<CharacterController2D>();
+        characterController.OnLand += OnLand;
+    }
 
-        LandSpeedLimit = Mathf.Abs(Physics2D.gravity.y);
+    void Start()
+    {
+        GameManager.Instance.OnLevelStarted += OnLevelStarted;
+        GameManager.Instance.OnLevelGoalReached += OnGoalreached;
+        GameManager.Instance.OnLevelFailed += OnLevelFailed;
+    }
+
+    void OnLevelStarted ()
+    {
+        ToggleMovement(true);
+    }
+
+    void OnGoalreached (int arg1, int arg2)
+    {
+        ToggleMovement(false);
+    }
+
+    void OnLevelFailed (int arg1, int arg2)
+    {
+        ToggleMovement(false);
+    }
+
+    void ToggleMovement (bool enabled)
+    {
+        if (movementEnabled == enabled)
+            return;
+
+        movementEnabled = enabled;
+        
+        if (movementEnabled)
+            GameManager.Instance.AddFixedUpdate(OnFixedUpdate);
+        else
+            GameManager.Instance.RemoveFixedUpdate(OnFixedUpdate);
+    }
+
+    void OnFixedUpdate ()
+    {
+        if (GameManager.Instance.IsPaused)
+            return;
+
+        if (GameManager.Instance.IsRotating)
+        {
+            localMoveVector = Vector2.zero;
+            return;
+        }
+
+        CheckHorizontalMovement(true);
+        CheckVerticalMovement();
+        CheckJump();
+
+        Vector2 worldRelativeMoveVector = localMoveVector.Rotate(GameManager.Instance.WorldRotationAngle);
+
+        characterController.Move(worldRelativeMoveVector * Time.fixedDeltaTime);
+    }
+
+    public void CheckHorizontalMovement (bool useInput, float speedScale = 1f)
+    {
+        float desiredSpeed = useInput ? input.horizontal * maxHorizontalSpeed * speedScale : 0f;
+        float tempAcceleration = useInput && Mathf.Approximately(input.horizontal, 0) ? deceleration : acceleration;
+
+        localMoveVector.x = Mathf.MoveTowards(localMoveVector.x, desiredSpeed, tempAcceleration * Time.fixedDeltaTime);
+    }
+
+    public void CheckVerticalMovement ()
+    {
+        //Check top hit and stop moving up
+        if (Mathf.Approximately(localMoveVector.y, 0f) ||
+            characterController.IsCeilinged && localMoveVector.y > 0f ||
+            characterController.IsGrounded && localMoveVector.y < -gravity * Time.fixedDeltaTime)
+        {
+            Debug.Log("Zeroed out move vector Y");
+            localMoveVector.y = 0f;
+        }
+        
+        localMoveVector.y -= gravity * Time.fixedDeltaTime;
+        
+        if (localMoveVector.y < -MaxFallSpeed)
+        {
+            Debug.Log("Limiting max fall speed");
+            localMoveVector.y = -MaxFallSpeed;
+        }
+    }
+    
+    public void CheckJump ()
+    {
+        if (input.jumpPressed && characterController.IsGrounded)
+        {
+            localMoveVector.y = jumpSpeed;
+        }
     }
 
     public void GoToSpawnPoint()
@@ -29,10 +147,11 @@ public class PlayerController : MonoBehaviour
 
     void OnLand ()
     {
-        if (Movement.DownwardsVelocity > LandSpeedLimit)
+        Debug.Log($"Landed with speed of {characterController.DownwardsVelocity}");
+        if (characterController.DownwardsVelocity > LandSpeedLimit)
         {
-            Debug.Log("Death by FALL. speed: " + Movement.DownwardsVelocity);
-            Kill(DeathReason.HIGH_FALL);
+            Debug.Log($"Death by FALL. LandSpeedLimit: {LandSpeedLimit}");
+            //Kill(DeathReason.HIGH_FALL);
         }
     }
 
@@ -50,10 +169,24 @@ public class PlayerController : MonoBehaviour
         }
         OnDeath?.Invoke();
     }
-
-    private void OnDestroy ()
+    
+     void OnDestroy ()
     {
-        Movement.OnLand -= OnLand;
+        characterController.OnLand -= OnLand;
+        GameManager.Instance.OnLevelStarted -= OnLevelStarted;
+        GameManager.Instance.OnLevelFailed -= OnLevelFailed;
+        GameManager.Instance.OnLevelGoalReached -= OnGoalreached;
+        GameManager.Instance.RemoveFixedUpdate(OnFixedUpdate);
+    }
+
+    void Update()
+    {
+        //Teport to mouse
+        if (Input.GetKey(KeyCode.LeftShift) && Input.GetMouseButtonDown(1))
+        {
+            Vector3 pos = Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, -Camera.main.transform.position.z));
+            characterController.Teleport(pos);
+        }
     }
 }
 

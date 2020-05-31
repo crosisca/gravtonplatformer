@@ -39,30 +39,30 @@ public class MovingPlatformEditor : Editor
         }
 
         EditorGUILayout.Separator();
-        EditorGUILayout.Separator();
+        //EditorGUILayout.Separator();
 
-        EditorGUILayout.BeginVertical("box");
-        EditorGUI.BeginChangeCheck();
-        bool isStartingMoving = EditorGUILayout.Toggle("Start moving", m_MovingPlatform.isMovingAtStart);
-        if (EditorGUI.EndChangeCheck())
-        {
-            Undo.RecordObject(target, "Changed move at start");
-            m_MovingPlatform.isMovingAtStart = isStartingMoving;
-        }
+        //EditorGUILayout.BeginVertical("box");
+        //EditorGUI.BeginChangeCheck();
+        //bool isStartingMoving = EditorGUILayout.Toggle("Start moving", m_MovingPlatform.isMovingAtStart);
+        //if (EditorGUI.EndChangeCheck())
+        //{
+        //    Undo.RecordObject(target, "Changed move at start");
+        //    m_MovingPlatform.isMovingAtStart = isStartingMoving;
+        //}
 
-        if(isStartingMoving)
-        {
-            EditorGUI.indentLevel += 1;
-            EditorGUI.BeginChangeCheck();
-            bool startOnlyWhenVisible = EditorGUILayout.Toggle("When becoming visible", m_MovingPlatform.startMovingOnlyWhenVisible);
-            if (EditorGUI.EndChangeCheck())
-            {
-                Undo.RecordObject(target, "Changed move when visible");
-                m_MovingPlatform.startMovingOnlyWhenVisible = startOnlyWhenVisible;
-            }
-            EditorGUI.indentLevel -= 1;
-        }
-        EditorGUILayout.EndVertical();
+        //if(isStartingMoving)
+        //{
+        //    EditorGUI.indentLevel += 1;
+        //    EditorGUI.BeginChangeCheck();
+        //    bool startOnlyWhenVisible = EditorGUILayout.Toggle("When becoming visible", m_MovingPlatform.startMovingOnlyWhenVisible);
+        //    if (EditorGUI.EndChangeCheck())
+        //    {
+        //        Undo.RecordObject(target, "Changed move when visible");
+        //        m_MovingPlatform.startMovingOnlyWhenVisible = startOnlyWhenVisible;
+        //    }
+        //    EditorGUI.indentLevel -= 1;
+        //}
+        //EditorGUILayout.EndVertical();
 
         EditorGUI.BeginChangeCheck();
         MovingPlatform.MovingPlatformType platformType = (MovingPlatform.MovingPlatformType)EditorGUILayout.EnumPopup("Looping", m_MovingPlatform.platformType);

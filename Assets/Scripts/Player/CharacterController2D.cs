@@ -8,6 +8,8 @@ public class CharacterController2D : MonoBehaviour
     [Tooltip("The distance down to check for ground.")]
     public float groundedRaycastDistance = 0.1f;
 
+    public event Action OnLand;
+
     Rigidbody2D m_Rigidbody2D;
     Vector2 m_PreviousPosition;
     Vector2 m_CurrentPosition;
@@ -20,6 +22,26 @@ public class CharacterController2D : MonoBehaviour
     public bool IsGrounded { get; protected set; }
     public bool IsCeilinged { get; protected set; }
     public Vector2 Velocity { get; protected set; }
+
+    public float DownwardsVelocity
+    {
+        get
+        {
+            switch (GameManager.Instance.GravityDirection)
+            {
+                case GravityDirection.UP:
+                    return m_Rigidbody2D.velocity.y;
+                case GravityDirection.DOWN:
+                    return -m_Rigidbody2D.velocity.y;
+                case GravityDirection.RIGHT:
+                    return m_Rigidbody2D.velocity.x;
+                case GravityDirection.LEFT:
+                    return -m_Rigidbody2D.velocity.x;
+                default:
+                    return 0;
+            }
+        }
+    }
 
     void Awake ()
     {
@@ -34,7 +56,7 @@ public class CharacterController2D : MonoBehaviour
     {
         m_PreviousPosition = m_Rigidbody2D.position;
         m_CurrentPosition = m_PreviousPosition + m_NextMovement;
-        Velocity = (m_CurrentPosition - m_PreviousPosition) / Time.deltaTime;
+        Velocity = (m_CurrentPosition - m_PreviousPosition) / Time.fixedDeltaTime;
 
         m_Rigidbody2D.MovePosition(m_CurrentPosition);
         m_NextMovement = Vector2.zero;
@@ -64,18 +86,15 @@ public class CharacterController2D : MonoBehaviour
         Vector2 delta = position - m_CurrentPosition;
         m_PreviousPosition += delta;
         m_CurrentPosition = position;
-        m_Rigidbody2D.MovePosition(position);
+        //m_Rigidbody2D.MovePosition(position);
+        m_Rigidbody2D.position = position;
     }
 
     void GroundCheck ()
     {
         bool wasGrounded = IsGrounded;
-
-        //Cast rays for the left and right foot
-        RaycastHit2D leftCheck = Raycast(new Vector2(-footOffset, 0f).Rotate(GameManager.Instance.WorldRotationAngle), GameManager.Instance.DirectionToGround, groundedRaycastDistance, groundedLayerMask);
-        RaycastHit2D rightCheck = Raycast(new Vector2(footOffset, 0f).Rotate(GameManager.Instance.WorldRotationAngle), GameManager.Instance.DirectionToGround, groundedRaycastDistance, groundedLayerMask);
         
-        IsGrounded = leftCheck || rightCheck;
+        IsGrounded = CheckVerticalBoundsHits(GameManager.Instance.DirectionToGround);
 
         if (IsGrounded && !wasGrounded)
             OnLand?.Invoke();
@@ -83,14 +102,16 @@ public class CharacterController2D : MonoBehaviour
 
     void CeilingCheck ()
     {
-        //Cast rays for the left and right foot
-        RaycastHit2D leftCheck = Raycast(new Vector2(-footOffset, boxCollider.size.y).Rotate(GameManager.Instance.WorldRotationAngle), -GameManager.Instance.DirectionToGround, groundedRaycastDistance, groundedLayerMask);
-        RaycastHit2D rightCheck = Raycast(new Vector2(footOffset, boxCollider.size.y).Rotate(GameManager.Instance.WorldRotationAngle), -GameManager.Instance.DirectionToGround, groundedRaycastDistance, groundedLayerMask);
-
-        IsCeilinged = leftCheck || rightCheck;
+        IsCeilinged = CheckVerticalBoundsHits(-GameManager.Instance.DirectionToGround, boxCollider.size.y);
     }
 
-    public event Action OnLand;
+    bool CheckVerticalBoundsHits(Vector2 direction, float heightOffset = 0)
+    {
+        RaycastHit2D leftCheck = Raycast(new Vector2(-footOffset, heightOffset).Rotate(GameManager.Instance.WorldRotationAngle), direction, groundedRaycastDistance, groundedLayerMask);
+        RaycastHit2D rightCheck = Raycast(new Vector2(footOffset, heightOffset).Rotate(GameManager.Instance.WorldRotationAngle), direction, groundedRaycastDistance, groundedLayerMask);
+
+        return leftCheck || rightCheck;
+    }
 
     RaycastHit2D Raycast (Vector2 offset, Vector2 rayDirection, float length, LayerMask mask)
     {

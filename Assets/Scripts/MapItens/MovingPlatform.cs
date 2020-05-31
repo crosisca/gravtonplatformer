@@ -36,7 +36,7 @@ public class MovingPlatform : MapItem
     protected Rigidbody2D m_Rigidbody2D;
     protected Vector2 m_Velocity;
 
-    protected bool m_Started = false;
+    //protected bool m_Started = false;
     //protected bool m_VeryFirstStart = false;
 
     public Vector2 Velocity
@@ -85,6 +85,14 @@ public class MovingPlatform : MapItem
         Init();
     }
 
+
+    protected override void OnLevelStarted()
+    {
+        base.OnLevelStarted();
+
+        ResetPlatform();
+    }
+
     protected void Init ()
     {
         m_Current = 0;
@@ -92,24 +100,12 @@ public class MovingPlatform : MapItem
         m_Next = localNodes.Length > 1 ? 1 : 0;
 
         m_WaitTime = waitTimes[0];
-
-        //m_VeryFirstStart = false;
-        if (isMovingAtStart)
-        {
-            m_Started = !startMovingOnlyWhenVisible;
-            //m_VeryFirstStart = true;
-        }
-        else
-            m_Started = false;
     }
     
     protected override void OnFixedUpdate ()
     {
         base.OnFixedUpdate();
 
-        if (!m_Started)
-            return;
-        
         //no need to update we have a single node in the path
         if (m_Current == m_Next)
             return;
@@ -154,7 +150,7 @@ public class MovingPlatform : MapItem
                                 break;
                             case MovingPlatformType.ONCE:
                                 m_Next -= 1;
-                                StopMoving();
+                                Deactivate();
                                 break;
                         }
                     }
@@ -176,7 +172,7 @@ public class MovingPlatform : MapItem
                                 break;
                             case MovingPlatformType.ONCE:
                                 m_Next += 1;
-                                StopMoving();
+                                Deactivate();
                                 break;
                         }
                     }
@@ -196,17 +192,7 @@ public class MovingPlatform : MapItem
                 break;
         }
     }
-
-    public void StartMoving ()
-    {
-        m_Started = true;
-    }
-
-    public void StopMoving ()
-    {
-        m_Started = false;
-    }
-
+    
     public void ResetPlatform ()
     {
         transform.position = m_WorldNode[0];
