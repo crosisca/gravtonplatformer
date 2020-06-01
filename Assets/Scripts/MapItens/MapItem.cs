@@ -7,7 +7,7 @@ public class MapItem : MonoBehaviour
 
     protected Vector2 Position2d => transform.position.AsVector2();
 
-    public virtual void Awake () { }
+    protected virtual void Awake () { }
 
     public virtual void Start () 
     {
@@ -31,7 +31,7 @@ public class MapItem : MonoBehaviour
         Deactivate();
     }
 
-    protected void Activate ()
+    protected virtual void Activate ()
     {
         Active = true;
 
@@ -39,7 +39,7 @@ public class MapItem : MonoBehaviour
         GameManager.Instance.AddFixedUpdate(OnFixedUpdate);
     }
     
-    protected void Deactivate()
+    protected virtual void Deactivate()
     {
         Active = false;
 
@@ -71,7 +71,7 @@ public class MapItem : MonoBehaviour
             return;
     }
 
-    void OnDestroy ()
+    protected virtual void OnDestroy ()
     {
         GameManager.Instance.OnLevelStarted -= OnLevelStarted;
         GameManager.Instance.OnLevelFailed -= OnLevelFailed;

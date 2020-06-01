@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using MEC;
 using UnityEngine;
@@ -17,7 +16,7 @@ public partial class GameManager : MonoBehaviour
     public Vector2 DirectionToGround => Vector2.down.Rotate(currentAngle);
 
     public float WorldRotationAngle => currentAngle;
-
+    
     public GravityDirection GravityDirection
     {
         get
@@ -39,17 +38,44 @@ public partial class GameManager : MonoBehaviour
     }
 
     bool canChangeRotation = false;
-
+    
     // Start is called before the first frame update
     void StartRotator ()
     {
         desiredGravity = Physics2D.gravity;
         gravityMagnitude = Physics2D.gravity.magnitude;
 
+        //if (Application.isMobilePlatform)
+        //    DeviceChange.OnOrientationChange += OnDeviceOrientationChanged;
+        //else
         AddUpdate(CheckRotationInputs);
 
         OnLevelStarted += OnLevelStart;
     }
+
+    //Mobile
+    //void OnDeviceOrientationChanged(DeviceOrientation orientation)
+    //{
+    //    switch (orientation)
+    //    {
+    //        case DeviceOrientation.Portrait:
+    //            RotateWorld(90);
+    //            break;
+    //        case DeviceOrientation.PortraitUpsideDown:
+    //            RotateWorld(270);
+    //            break;
+    //        case DeviceOrientation.LandscapeLeft:
+    //            RotateWorld(0);
+    //            break;
+    //        case DeviceOrientation.LandscapeRight:
+    //            RotateWorld(180);
+    //            break;
+    //        case DeviceOrientation.Unknown:
+    //        case DeviceOrientation.FaceUp:
+    //        case DeviceOrientation.FaceDown:
+    //            break;
+    //    }
+    //}
 
     private void OnLevelStart ()
     {
@@ -66,6 +92,15 @@ public partial class GameManager : MonoBehaviour
     {
         if (IsRotating || IsPaused || !canChangeRotation)
             return;
+
+        //if (Input.GetKeyDown(KeyCode.Alpha1))
+        //    OnDeviceOrientationChanged(DeviceOrientation.Portrait);
+        //if (Input.GetKeyDown(KeyCode.Alpha2))
+        //    OnDeviceOrientationChanged(DeviceOrientation.LandscapeLeft);
+        //if (Input.GetKeyDown(KeyCode.Alpha3))
+        //    OnDeviceOrientationChanged(DeviceOrientation.PortraitUpsideDown);
+        //if (Input.GetKeyDown(KeyCode.Alpha4))
+        //    OnDeviceOrientationChanged(DeviceOrientation.LandscapeRight);
 
         if (Input.GetKeyDown(KeyCode.E))
             RotateWorld(currentAngle + 90);
@@ -144,6 +179,10 @@ public partial class GameManager : MonoBehaviour
     void DestroyRotator ()
     {
         Player.CharacterController.OnLand -= OnPlayerLand;
+
+        //if (Application.isMobilePlatform)
+        //    DeviceChange.OnOrientationChange -= OnDeviceOrientationChanged;
+        //else
         RemoveUpdate(CheckRotationInputs);
     }
 }

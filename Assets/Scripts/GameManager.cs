@@ -228,7 +228,8 @@ public partial class GameManager : MonoBehaviour
 
     IEnumerator<float> LoadLevelAsync(int world, int level)
     {
-        string sceneName = $"World{world}Level{level}";
+        //string sceneName = $"World{world}Level{level}";
+        string sceneName = $"LevelScene";
 
         AsyncOperation loadLevelOperation = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
 
@@ -244,6 +245,8 @@ public partial class GameManager : MonoBehaviour
 
         activeLevel = SceneManager.GetSceneByName(sceneName);
         SceneManager.SetActiveScene(activeLevel);
+
+        Instantiate(Resources.Load($"World{world}Level{level}"));
         loadedWorldNumber = world;
         loadedLevelNumber = level;
     }
