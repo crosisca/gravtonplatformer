@@ -154,7 +154,7 @@ public class PlatformCatcher : MonoBehaviour
     void CheckRigidbodyContacts (Rigidbody2D rb)
     {
         int contactCount = rb.GetContacts(contactFilter, m_ContactPoints);
-
+        
         for (int j = 0; j < contactCount; j++)
         {
             ContactPoint2D contactPoint2D = m_ContactPoints[j];
@@ -169,14 +169,14 @@ public class PlatformCatcher : MonoBehaviour
                     break;
                 }
             }
-
+            
             if (listIndex == -1)
             {
                 if (contactRigidbody != null)
                 {
                     if (contactRigidbody.bodyType != RigidbodyType2D.Static && contactRigidbody != platformRigidbody)
                     {
-                        float dot = Vector2.Dot(contactPoint2D.normal, Vector2.down);
+                        float dot = Vector2.Dot(contactPoint2D.normal, Vector2.down.Rotate(GameManager.Instance.WorldRotationAngle));
                         if (dot > 0.8f)
                         {
                             CaughtObject newCaughtObject = new CaughtObject
@@ -210,7 +210,7 @@ public class PlatformCatcher : MonoBehaviour
         for (int i = 0, count = m_CaughtObjects.Count; i < count; i++)
         {
             CaughtObject caughtObject = m_CaughtObjects[i];
-            if (m_ParentCatcher != null && m_ParentCatcher.m_CaughtObjects.Find((CaughtObject A) => { return A.rigidbody == caughtObject.rigidbody; }) != null)
+            if (m_ParentCatcher != null && m_ParentCatcher.m_CaughtObjects.Find((CaughtObject A) => A.rigidbody == caughtObject.rigidbody) != null)
             {
                 continue;
             }

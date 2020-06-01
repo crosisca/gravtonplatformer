@@ -3,6 +3,9 @@ using UnityEngine;
 
 public class MapItem : MonoBehaviour
 {
+    [SerializeField]
+    public bool startActivated = true;
+
     public bool Active { get;private set; } = false;
 
     protected Vector2 Position2d => transform.position.AsVector2();
@@ -18,7 +21,8 @@ public class MapItem : MonoBehaviour
 
     protected virtual void OnLevelStarted ()
     {
-        Activate();
+        if(startActivated)
+            Activate();
     }
 
     void OnLevelFailed (int arg1, int arg2)
@@ -31,8 +35,11 @@ public class MapItem : MonoBehaviour
         Deactivate();
     }
 
-    protected virtual void Activate ()
+    public virtual void Activate ()
     {
+        if (Active)
+            return;
+
         Active = true;
 
         GameManager.Instance.AddUpdate(OnUpdate);
@@ -41,6 +48,9 @@ public class MapItem : MonoBehaviour
     
     protected virtual void Deactivate()
     {
+        if (!Active)
+            return;
+
         Active = false;
 
         GameManager.Instance.RemoveUpdate(OnUpdate);

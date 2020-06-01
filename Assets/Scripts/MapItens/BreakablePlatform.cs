@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.Remoting;
 using MEC;
 using UnityEngine;
 
@@ -24,7 +23,7 @@ public class BreakablePlatform : MapItem
         renderers = GetComponentsInChildren<Renderer>();
     }
 
-    protected override void Activate()
+    public override void Activate()
     {
         base.Activate();
 

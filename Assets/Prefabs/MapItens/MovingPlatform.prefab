@@ -341,8 +341,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f10291760c8c0c4dbba76c7a0c5db4b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  endPositionTransform: {fileID: 0}
+  startActivated: 1
+  platformCatcher: {fileID: 0}
   speed: 1
+  platformType: 0
+  localNodes:
+  - {x: 0, y: 0, z: 0}
+  waitTimes:
+  - 0
 --- !u!251 &5321037754933335063
 PlatformEffector2D:
   m_ObjectHideFlags: 0
@@ -356,7 +362,7 @@ PlatformEffector2D:
     serializedVersion: 2
     m_Bits: 4294967295
   m_RotationalOffset: 0
-  m_UseOneWay: 1
+  m_UseOneWay: 0
   m_UseOneWayGrouping: 0
   m_SurfaceArc: 180
   m_UseSideFriction: 0

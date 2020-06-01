@@ -39,6 +39,17 @@ public class MovingPlatformEditor : Editor
         }
 
         EditorGUILayout.Separator();
+
+        EditorGUILayout.BeginVertical("box");
+        EditorGUI.BeginChangeCheck();
+        bool isStartActivated = EditorGUILayout.Toggle("Start Activated", m_MovingPlatform.startActivated);
+        if (EditorGUI.EndChangeCheck())
+        {
+            Undo.RecordObject(target, "Changed start activated");
+            m_MovingPlatform.startActivated = isStartActivated;
+        }
+        EditorGUILayout.EndVertical();
+
         //EditorGUILayout.Separator();
 
         //EditorGUILayout.BeginVertical("box");

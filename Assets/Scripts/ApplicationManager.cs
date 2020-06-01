@@ -19,6 +19,8 @@ public class ApplicationManager : MonoBehaviour
     public event Action OnGameSessionStarted;
     public event Action OnGameSessionFinished;
 
+    public static bool IsAnyLevelLoaded = false;
+
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
     public static void Initialize()
     {
@@ -46,12 +48,18 @@ public class ApplicationManager : MonoBehaviour
 
     void StartGameLevel(int worldNumber, int levelNumber)
     {
-        if (GameManager != null)//level is already loaded
+        Debug.Log($"StartGameLevel {worldNumber}-{levelNumber}");
+        if (IsAnyLevelLoaded) //level is already loaded
+        {
+            Debug.LogError("Level already loaded. Ignoring");
             return;
+        }
 
         GameManager = Instantiate(Resources.Load<GameManager>(Constants.GameManagerPrefabPath));
 
         GameManager.StartNewLevel(worldNumber, levelNumber);
+
+        IsAnyLevelLoaded = true;
 
         OnGameSessionStarted?.Invoke();
     }
@@ -69,12 +77,24 @@ public class ApplicationManager : MonoBehaviour
         int nextLevelNumber = GameManager.Instance.loadedLevelNumber + 1;
         EndGameLevel();
 
-        Timing.CallDelayed(Timing.WaitUntilTrue(() => GameManager == null), () => StartGameLevel(curentWorldNumber, nextLevelNumber));
+        Debug.Log($"Go to next level: {curentWorldNumber}-{nextLevelNumber}");
+
+        Timing.RunCoroutine(WaitPreviousLevelUnloadAndLoadNext(curentWorldNumber, nextLevelNumber));
+    }
+
+    IEnumerator<float> WaitPreviousLevelUnloadAndLoadNext(int worldNumber, int lvlNumber)
+    {
+        while (IsAnyLevelLoaded)
+        {
+            Debug.Log("Waiting previous level to unload");
+            yield return 0;
+        }
+        StartGameLevel(worldNumber, lvlNumber);
     }
 
     public void EndGameLevel()
     {
-        if (GameManager == null)
+        if (!IsAnyLevelLoaded)
             return;
 
         OnGameSessionFinished?.Invoke();
@@ -90,7 +110,9 @@ public class ApplicationManager : MonoBehaviour
 
     public void DestroyGameManager()
     {
+        Debug.Log("Destroying GameManager");
         Destroy(GameManager.gameObject);
-        GameManager = null;
+
+        IsAnyLevelLoaded = false;
     }
 }

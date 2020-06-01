@@ -14,10 +14,7 @@ public class MovingPlatform : MapItem
     public PlatformCatcher platformCatcher;
     public float speed = 1.0f;
     public MovingPlatformType platformType;
-
-    //public bool startMovingOnlyWhenVisible;
-    //public bool isMovingAtStart = true;
-
+    
     [HideInInspector]
     public Vector3[] localNodes = new Vector3[1];
 
@@ -35,10 +32,7 @@ public class MovingPlatform : MapItem
 
     protected Rigidbody2D m_Rigidbody2D;
     protected Vector2 m_Velocity;
-
-    //protected bool m_Started = false;
-    //protected bool m_VeryFirstStart = false;
-
+    
     public Vector2 Velocity
     {
         get { return m_Velocity; }
