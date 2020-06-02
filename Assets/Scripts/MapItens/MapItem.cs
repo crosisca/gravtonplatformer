@@ -7,9 +7,7 @@ public class MapItem : MonoBehaviour
     public bool startActivated = true;
 
     public bool Active { get;private set; } = false;
-
-    protected Vector2 Position2d => transform.position.AsVector2();
-
+    
     protected virtual void Awake () { }
 
     public virtual void Start () 
