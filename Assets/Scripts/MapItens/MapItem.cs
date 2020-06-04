@@ -57,26 +57,18 @@ public class MapItem : MonoBehaviour
 
     protected virtual void OnUpdate()
     {
-        if (!Active || GameManager.Instance.IsPaused)
-            return;
     }
 
     protected virtual void OnFixedUpdate()
     {
-        if (!Active || GameManager.Instance.IsPaused) 
-            return;
     }
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!Active)
-            return;
     }
 
-    protected virtual void OnTriggerEnter2D (Collider2D collision)
+    protected virtual void OnTriggerEnter2D (Collider2D collider)
     {
-        if (!Active) 
-            return;
     }
 
     protected virtual void OnDestroy ()

@@ -99,7 +99,7 @@ public class MovingPlatform : MapItem
     protected override void OnFixedUpdate ()
     {
         base.OnFixedUpdate();
-
+        
         //no need to update we have a single node in the path
         if (m_Current == m_Next)
             return;
@@ -109,6 +109,7 @@ public class MovingPlatform : MapItem
             m_WaitTime -= Time.deltaTime;
             return;
         }
+
         
         float distanceToGo = speed * Time.deltaTime;
 

@@ -32,6 +32,8 @@ public partial class GameManager : MonoBehaviour
 
     CoroutineHandle startLevelCoroutine;
 
+    List<Action> waitingToRegisteredFixedUpdates = new List<Action>();
+
     List<Action> registeredUpdates = new List<Action>();
     List<Action> registeredFixedUpdates = new List<Action>();
     List<Action> registeredLateUpdates = new List<Action>();
@@ -100,7 +102,8 @@ public partial class GameManager : MonoBehaviour
 
     public void AddFixedUpdate (Action func)
     {
-        registeredFixedUpdates.Add(func);
+        waitingToRegisteredFixedUpdates.Add(func);
+        //registeredFixedUpdates.Add(func);
     }
 
     public void RemoveFixedUpdate (Action func)
@@ -116,8 +119,14 @@ public partial class GameManager : MonoBehaviour
             if (gameObject.activeInHierarchy && enabled)
             {
                 OnFixedUpdate();
+
                 foreach (Action func in registeredFixedUpdates)
                     func();
+
+                foreach (Action waitingFunc in waitingToRegisteredFixedUpdates)
+                    registeredFixedUpdates.Add(waitingFunc);
+
+                waitingToRegisteredFixedUpdates.Clear();
             }
             yield return Timing.WaitForOneFrame;
         }

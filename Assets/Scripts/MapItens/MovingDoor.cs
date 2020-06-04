@@ -7,7 +7,7 @@ public class MovingDoor : MapItem
     new Rigidbody2D rigidbody2D;
 
     [SerializeField]
-    float yRotationWhenOpen;
+    float yRotationWhenOpen = 0;
 
     [SerializeField]
     float rotationSpeed = 90;

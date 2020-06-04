@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class EndPoint : MapItem
 {
-    protected override void OnTriggerEnter2D (Collider2D collision)
+    protected override void OnTriggerEnter2D (Collider2D collider)
     {
-        base.OnTriggerEnter2D(collision);
+        base.OnTriggerEnter2D(collider);
 
-        if (collision.CompareTag("Player"))
+        if (collider.CompareTag("Player"))
             GameManager.Instance.LevelGoalReached(this);
     }
 }

@@ -5,9 +5,9 @@ public class MapItemActivator : MapItem
     [SerializeField]
     MapItem[] connectedItens = new MapItem[0];
 
-    protected override void OnTriggerEnter2D (Collider2D collision)
+    protected override void OnTriggerEnter2D (Collider2D collider)
     {
-        if (collision.CompareTag("Player"))
+        if (collider.CompareTag("Player"))
         {
             foreach (MapItem connectedIten in connectedItens)
                 connectedIten.Activate();
