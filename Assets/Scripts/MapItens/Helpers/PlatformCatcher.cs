@@ -11,6 +11,7 @@ public class PlatformCatcher : MonoBehaviour
         public Collider2D collider;
         public CharacterController2D character;
         public bool inContact;
+        public bool wasInContact;
         public bool checkedThisFrame;
 
         public void Move (Vector2 movement)
@@ -98,9 +99,11 @@ public class PlatformCatcher : MonoBehaviour
         for (int i = 0, count = m_CaughtObjects.Count; i < count; i++)
         {
             CaughtObject caughtObject = m_CaughtObjects[i];
+
+            caughtObject.wasInContact = caughtObject.inContact;
+
             caughtObject.inContact = false;
             caughtObject.checkedThisFrame = false;
-            OnLost?.Invoke(caughtObject);
         }
 
         CheckRigidbodyContacts(platformRigidbody);
@@ -135,7 +138,6 @@ public class PlatformCatcher : MonoBehaviour
                         if (yDiff > 0 && yDiff < 0.05f)
                         {
                             caughtObject.inContact = true;
-                            OnCaught?.Invoke(caughtObject);
                             caughtObject.checkedThisFrame = true;
                         }
                     }
@@ -155,6 +157,17 @@ public class PlatformCatcher : MonoBehaviour
             }
         }
         while (checkAgain);
+
+        for (int i = 0, count = m_CaughtObjects.Count; i < count; i++)
+        {
+            CaughtObject caughtObject = m_CaughtObjects[i];
+
+            if(!caughtObject.wasInContact && caughtObject.inContact)
+                OnCaught?.Invoke(caughtObject);
+
+            if (caughtObject.wasInContact && !caughtObject.inContact)
+                OnLost?.Invoke(caughtObject);
+        }
     }
 
     void CheckRigidbodyContacts (Rigidbody2D rb)
@@ -195,7 +208,7 @@ public class PlatformCatcher : MonoBehaviour
                             };
 
                             m_CaughtObjects.Add(newCaughtObject);
-                            OnCaught?.Invoke(newCaughtObject);
+                            //OnCaught?.Invoke(newCaughtObject);
                         }
                     }
                 }
@@ -203,7 +216,9 @@ public class PlatformCatcher : MonoBehaviour
             else
             {
                 m_CaughtObjects[listIndex].inContact = true;
-                OnCaught?.Invoke(m_CaughtObjects[listIndex]);
+
+                //if(!m_CaughtObjects[listIndex].wasInContact)
+                //    OnCaught?.Invoke(m_CaughtObjects[listIndex]);
             }
         }
     }

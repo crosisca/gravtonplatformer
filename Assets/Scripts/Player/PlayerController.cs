@@ -121,8 +121,13 @@ public class PlayerController : MonoBehaviour
     {
         float desiredSpeed = useInput ? input.horizontal * maxHorizontalSpeed * speedScale : 0f;
         float tempAcceleration = useInput && Mathf.Approximately(input.horizontal, 0) ? isSliding ? slidingDeceleration : deceleration : isSliding ? slidingAcceleration : acceleration;
-
+        
         localMoveVector.x = Mathf.MoveTowards(localMoveVector.x, desiredSpeed, tempAcceleration * Time.fixedDeltaTime);
+
+        //Remove lateral movement if blocked by a wall
+        if (localMoveVector.x > 0 && characterController.IsBlockedOnRight || 
+            localMoveVector.x < 0 && characterController.IsBlockedOnLeft)
+            localMoveVector.x = 0;
     }
 
     public void CheckVerticalMovement ()
@@ -135,6 +140,7 @@ public class PlayerController : MonoBehaviour
             localMoveVector.y = 0f;
         }
         
+        //if(!characterController.IsGrounded) //Not necessary but avoids moving vector being always negative on Y
         localMoveVector.y -= gravity * Time.fixedDeltaTime;
         
         if (localMoveVector.y < -MaxFallSpeed)

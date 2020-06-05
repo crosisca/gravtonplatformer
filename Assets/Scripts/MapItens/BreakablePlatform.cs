@@ -15,12 +15,17 @@ public class BreakablePlatform : MapItem
 
     Renderer[] renderers;
 
+    PlatformCatcher platformCatcher;
+
     protected override void Awake()
     {
         base.Awake();
         
         boxCollider2d = GetComponent<BoxCollider2D>();
         renderers = GetComponentsInChildren<Renderer>();
+
+        platformCatcher = GetComponent<PlatformCatcher>();
+        platformCatcher.OnCaught += OnCaught;
     }
 
     public override void Activate()
@@ -33,28 +38,19 @@ public class BreakablePlatform : MapItem
         SetOpacity(1);
     }
 
-    void SetOpacity(float alpha)
+    void OnCaught (PlatformCatcher.CaughtObject caughtObj)
     {
-        foreach (Renderer renderer in renderers)
-        {
-            Color newColor = renderer.material.color;
-            newColor.a = alpha;
-            renderer.material.color = newColor;
-        }
+        if (caughtObj.collider.CompareTag("Player"))
+            StartBreaking();
     }
 
-    protected override void OnCollisionEnter2D(Collision2D col)
+    void StartBreaking()
     {
-        base.OnCollisionEnter2D(col);
-
-        if (col.gameObject.CompareTag("Player"))
-        {
-            Debug.Log($"Platform will break in {breakDelay} seconds");
-            Timing.KillCoroutines(breakCoroutine);
-            breakCoroutine = Timing.RunCoroutine(BreakCoroutine());
-        }
+        Debug.Log($"Platform will break in {breakDelay} seconds");
+        Timing.KillCoroutines(breakCoroutine);
+        breakCoroutine = Timing.RunCoroutine(BreakCoroutine());
     }
-
+    
     IEnumerator<float> BreakCoroutine()
     {
         yield return Timing.WaitForSeconds(breakDelay);
@@ -68,8 +64,19 @@ public class BreakablePlatform : MapItem
         boxCollider2d.enabled = false;
     }
 
+    void SetOpacity (float alpha)
+    {
+        foreach (Renderer renderer in renderers)
+        {
+            Color newColor = renderer.material.color;
+            newColor.a = alpha;
+            renderer.material.color = newColor;
+        }
+    }
+
     protected override void OnDestroy()
     {
+        platformCatcher.OnCaught -= OnCaught;
         Timing.KillCoroutines(breakCoroutine);
 
         base.OnDestroy();

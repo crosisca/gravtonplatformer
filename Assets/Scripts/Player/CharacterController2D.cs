@@ -21,6 +21,9 @@ public class CharacterController2D : MonoBehaviour
 
     public bool IsGrounded { get; protected set; }
     public bool IsCeilinged { get; protected set; }
+    public bool IsBlockedOnRight { get; protected set; }
+    public bool IsBlockedOnLeft { get; protected set; }
+
     [SerializeField]
     public Vector2 Velocity { get; protected set; }
 
@@ -65,8 +68,7 @@ public class CharacterController2D : MonoBehaviour
         GroundCheck();
         CeilingCheck();
 
-        //CheckCapsuleEndCollisions();
-        //CheckCapsuleEndCollisions(false);
+        LateralHitCheck();
     }
 
     /// <summary>
@@ -87,7 +89,6 @@ public class CharacterController2D : MonoBehaviour
         Vector2 delta = position - m_CurrentPosition;
         m_PreviousPosition += delta;
         m_CurrentPosition = position;
-        //m_Rigidbody2D.MovePosition(position);
         m_Rigidbody2D.position = position;
     }
 
@@ -112,6 +113,22 @@ public class CharacterController2D : MonoBehaviour
         RaycastHit2D rightCheck = Raycast(new Vector2(footOffset, heightOffset).Rotate(GameManager.Instance.WorldRotationAngle), direction, groundedRaycastDistance, groundedLayerMask);
 
         return leftCheck || rightCheck;
+    }
+
+    void LateralHitCheck()
+    {
+        IsBlockedOnRight = CheckHorizontalBoundsHits(Vector2.right.Rotate(GameManager.Instance.WorldRotationAngle), boxCollider.size.x / 2);
+        IsBlockedOnLeft = CheckHorizontalBoundsHits(Vector2.left.Rotate(GameManager.Instance.WorldRotationAngle), -boxCollider.size.x / 2);
+    }
+
+    bool CheckHorizontalBoundsHits (Vector2 direction, float horizontalOffset = 0)
+    {
+        float topOffset = boxCollider.size.y * 0.99f;
+        float bottomOffset = boxCollider.size.y * 0.01f;
+        RaycastHit2D bottomCheck = Raycast(new Vector2(horizontalOffset, bottomOffset).Rotate(GameManager.Instance.WorldRotationAngle), direction, groundedRaycastDistance, groundedLayerMask);
+        RaycastHit2D topCheck = Raycast(new Vector2(horizontalOffset, topOffset).Rotate(GameManager.Instance.WorldRotationAngle), direction, groundedRaycastDistance, groundedLayerMask);
+
+        return bottomCheck || topCheck;
     }
 
     RaycastHit2D Raycast (Vector2 offset, Vector2 rayDirection, float length, LayerMask mask)

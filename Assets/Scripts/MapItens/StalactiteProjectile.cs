@@ -40,9 +40,7 @@ public class StalactiteProjectile : InstantKillHazard, IPoolable
     protected override void OnCollisionEnter2D(Collision2D collision)
     {
         base.OnCollisionEnter2D(collision);
-
-        Debug.Log($"Collided with {collision.gameObject.name}");
-
+        
         if (collision.gameObject.layer == LayerMask.NameToLayer("Ground") || 
             collision.gameObject.layer == LayerMask.NameToLayer("Player") || 
             collision.gameObject.layer == LayerMask.NameToLayer("Platform"))

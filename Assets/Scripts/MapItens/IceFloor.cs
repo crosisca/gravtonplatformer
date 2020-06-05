@@ -28,6 +28,8 @@ public class IceFloor : MonoBehaviour
                 player = caughtObj.collider.GetComponent<PlayerController>();
 
             player.isSliding = true;
+            Debug.Log("Caught Player");
+
         }
     }
 
@@ -36,6 +38,7 @@ public class IceFloor : MonoBehaviour
         if (lostObj.collider.CompareTag("Player"))
         {
             player.isSliding = false;
+            Debug.Log("Lost Player");
         }
     }
 
@@ -44,22 +47,4 @@ public class IceFloor : MonoBehaviour
         platformCatcher.OnCaught -= OnCaught;
         platformCatcher.OnLost -= OnLost;
     }
-
-    //void OnCollisionEnter2D (Collision2D collision)
-    //{
-    //    if (collision.gameObject.CompareTag("Player"))
-    //    {
-    //        player = collision.gameObject.GetComponent<PlayerController>();
-    //        player.isSliding = true;
-    //    }
-    //}
-
-    //void OnCollisionExit2D (Collision2D collision)
-    //{
-    //    if (collision.gameObject.CompareTag("Player"))
-    //    {
-    //        player.isSliding = false;
-    //        player = null;
-    //    }
-    //}
 }
