@@ -25,6 +25,8 @@ public class PlatformCatcher : MonoBehaviour
         }
     }
 
+    public event Action<CaughtObject> OnCaught;
+    public event Action<CaughtObject> OnLost;
 
     public Rigidbody2D platformRigidbody;
     public ContactFilter2D contactFilter;
@@ -35,6 +37,8 @@ public class PlatformCatcher : MonoBehaviour
     protected PlatformCatcher m_ParentCatcher;
 
     protected Action<Vector2> m_MoveDelegate = null;
+
+    public List<CaughtObject> CaughtObjects => m_CaughtObjects;
 
     public int CaughtObjectCount
     {
@@ -96,6 +100,7 @@ public class PlatformCatcher : MonoBehaviour
             CaughtObject caughtObject = m_CaughtObjects[i];
             caughtObject.inContact = false;
             caughtObject.checkedThisFrame = false;
+            OnLost?.Invoke(caughtObject);
         }
 
         CheckRigidbodyContacts(platformRigidbody);
@@ -130,6 +135,7 @@ public class PlatformCatcher : MonoBehaviour
                         if (yDiff > 0 && yDiff < 0.05f)
                         {
                             caughtObject.inContact = true;
+                            OnCaught?.Invoke(caughtObject);
                             caughtObject.checkedThisFrame = true;
                         }
                     }
@@ -189,6 +195,7 @@ public class PlatformCatcher : MonoBehaviour
                             };
 
                             m_CaughtObjects.Add(newCaughtObject);
+                            OnCaught?.Invoke(newCaughtObject);
                         }
                     }
                 }
@@ -196,6 +203,7 @@ public class PlatformCatcher : MonoBehaviour
             else
             {
                 m_CaughtObjects[listIndex].inContact = true;
+                OnCaught?.Invoke(m_CaughtObjects[listIndex]);
             }
         }
     }

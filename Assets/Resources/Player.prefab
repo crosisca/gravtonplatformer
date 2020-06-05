@@ -109,7 +109,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53c80eafcadd8334db6c346b26d2f643, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  localMoveVector: {x: 0, y: -20}
+  localMoveVector: {x: 0, y: -1.1999999}
   gravity: 30
   maxHorizontalSpeed: 7
   jumpSpeed: 13.5
@@ -117,6 +117,10 @@ MonoBehaviour:
   deceleration: 500
   LandSpeedLimit: 20
   MaxFallSpeed: 25
+  slidingAcceleration: 5
+  slidingDeceleration: 0
+  canMove: 1
+  isSliding: 0
 --- !u!114 &3008853377544411212
 MonoBehaviour:
   m_ObjectHideFlags: 0

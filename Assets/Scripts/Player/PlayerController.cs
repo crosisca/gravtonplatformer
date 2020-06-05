@@ -23,22 +23,31 @@ public class PlayerController : MonoBehaviour
     float jumpSpeed = 10;
 
     [SerializeField]
-    float acceleration = 100f;
+    float acceleration = 500;
     [SerializeField]
-    float deceleration = 100f;
+    float deceleration = 500;
 
     [SerializeField]
     float LandSpeedLimit = 20;
 
     [SerializeField]
-    float MaxFallSpeed = 30;
+    float MaxFallSpeed = 25;
 
+    [SerializeField]
+    float slidingAcceleration = 5;
+    [SerializeField]
+    float slidingDeceleration = 0;
 
     PlayerInput input;
     CharacterController2D characterController;
     public CharacterController2D CharacterController => characterController;
 
     bool movementEnabled;
+
+    public bool canMove = true;
+
+    public bool isSliding = false;
+
 
     protected const float k_GroundedStickingVelocityMultiplier = 3f;    // This is to help the character stick to vertically moving platforms.
 
@@ -95,8 +104,12 @@ public class PlayerController : MonoBehaviour
             return;
         }
 
-        CheckHorizontalMovement(true);
-        CheckVerticalMovement();
+        if (canMove)
+        {
+            CheckHorizontalMovement(true);
+            CheckVerticalMovement();
+        }
+
         CheckJump();
 
         Vector2 worldRelativeMoveVector = localMoveVector.Rotate(GameManager.Instance.WorldRotationAngle);
@@ -107,7 +120,7 @@ public class PlayerController : MonoBehaviour
     public void CheckHorizontalMovement (bool useInput, float speedScale = 1f)
     {
         float desiredSpeed = useInput ? input.horizontal * maxHorizontalSpeed * speedScale : 0f;
-        float tempAcceleration = useInput && Mathf.Approximately(input.horizontal, 0) ? deceleration : acceleration;
+        float tempAcceleration = useInput && Mathf.Approximately(input.horizontal, 0) ? isSliding ? slidingDeceleration : deceleration : isSliding ? slidingAcceleration : acceleration;
 
         localMoveVector.x = Mathf.MoveTowards(localMoveVector.x, desiredSpeed, tempAcceleration * Time.fixedDeltaTime);
     }
